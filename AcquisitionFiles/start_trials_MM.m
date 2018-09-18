@@ -18,9 +18,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         scanimage_client_skt = connect_to_scanimage();
         disp('Connected to scanimage server');
     end
-    %     viz_figs.run_traj_fig = figure();
-    %     viz_figs.velocity_tc_fig = figure();
-    %     viz_figs.velocity_tc_single_fig = figure(); % single trial time course
+
     sid = run_obj.sid;
     
     % Run trials
@@ -39,7 +37,11 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         
         % Run trial
         tic
-        [fictracData, trial_time, outputData] = run_trial_MM_CL(currTask, run_obj, scanimage_client_skt, currTrialCoreName );
+        if contains(currTask, 'Closed_Loop')
+            [fictracData, trial_time, outputData] = run_trial_MM_CL(currTask, run_obj, scanimage_client_skt, currTrialCoreName );
+        else
+            [fictracData, trial_time, outputData] = run_trial_MM(currTask, run_obj, scanimage_client_skt, currTrialCoreName );
+        end
         disp(['Running trial took ', sprintf('%0.2f', toc), ' sec  (acquisition duration: ', num2str(sum(run_obj.trialDuration)), ' sec)']);
         
         % Save ball data
@@ -73,7 +75,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         
         % wait for an inter-trial period
         if( iTrial < nTasks )
-            disp(sprintf(['Finished with trial: ' num2str(iTrial - 1) '. \nWaiting for ' num2str(run_obj.ITI) ' seconds till next trial...\n']));
+            fprintf(['Finished with trial: ' num2str(iTrial - 1) '. \nWaiting for ' num2str(run_obj.ITI) ' seconds till next trial...\n']);
             pause(run_obj.ITI);
         end
     end%for iTrial
@@ -83,10 +85,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         fprintf(scanimage_client_skt, 'END_OF_SESSION');
         fclose(scanimage_client_skt);
     end
-       
-    % Update session id
-%     set(run_obj.sidHandle, 'String', num2str(sid + 1));
-    
+           
     disp('Trials complete.')
 else
     disp(STIM_TYPE);
