@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="actuatorMovementScripts" Database="" Version="10.0.0">
+  <Project Name="home" Path="actuatorMovementScripts.project" Active="No"/>
+  <Project Name="move" Path="move.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="home" ConfigName="Debug"/>
+      <Project Name="move" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="home" ConfigName="Debug"/>
+      <Project Name="move" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
