@@ -15,32 +15,31 @@ s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 s.addAnalogInputChannel('Dev1', 0, 'Voltage');
 
 % Add analog input channels for FicTrac data
-ai_channels_used = [0:3];
-aI = s.addAnalogInputChannel('Dev3', ai_channels_used, 'Voltage');
+ai_channels_used = [5:7, 14:15];
+aI = s.addAnalogInputChannel('Dev1', ai_channels_used, 'Voltage');
 for i=1:length(ai_channels_used)
     aI(i).InputType = 'SingleEnded';
 end
 
 % Add closed loop activation output channel
-s.addAnalogOutputChannel('Dev3', 0, 'Voltage');
+s.addAnalogOutputChannel('Dev1', 0, 'Voltage');
 
 % Add output channel for camera trigger (7)
-s.addDigitalChannel('Dev3', ['port0/line7'], 'OutputOnly');
+s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
 
 % Input channels:
 %
-%   Dev3:
-%       AI.0 = olfactometer valve A/shutoff B command
-%       AI.1 = olfactometer valve B/shutoff A command
-%       AI.2 = olfactometer NO valve command
-%       AI.3 = FicTrac Yaw
+%   Dev1:
+%       AI.5 = olfactometer valve A/shutoff B command
+%       AI.6 = olfactometer valve B/shutoff A command
+%       AI.7 = olfactometer NO valve command
+%       AI.14 = FicTrac Yaw
+%       AI.15 = FicTrac XY
 %
 % Output channels:
 %
 %   Dev1:
 %       P0.0        = external trigger for scanimage
-%
-%   Dev3:
 %       AO.0        = closed loop activation output
 %       P0.7        = camera trigger
 

@@ -10,18 +10,12 @@ s = daq.createSession('ni');
 % This channel is for external triggering of scanimage 5.1
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
-% Add analog input channels for FicTrac data
-ai_channels_used = [8:10];
-aI = s.addAnalogInputChannel('Dev1', ai_channels_used, 'Voltage');
-for i=1:length(ai_channels_used)
-    aI(i).InputType = 'SingleEnded';
-end
-
 % Add output channel for speaker
-s.addAnalogOutputChannel('Dev3', 0, 'Voltage');
+s.addAnalogOutputChannel('Dev1', 2, 'Voltage');
 
 % Add output channels for olfactometer (2-6) and camera trigger (7)
-s.addDigitalChannel('Dev3', ['port0/line2:7'], 'OutputOnly');
+chanIDs = {'port0/line1', 'port0/line2', 'port0/line3', 'port0/line7'};
+s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 
 % Input channels:
 %
@@ -34,13 +28,10 @@ s.addDigitalChannel('Dev3', ['port0/line2:7'], 'OutputOnly');
 %
 %   Dev1:
 %       P0.0        = external trigger for scanimage
-%   Dev3:
-%       AO.1        = speaker output
-%       P0.2        = olfactometer valve A/shutoff B
-%       P0.3        = olfactometer valve B/shutoff A
-%       P0.4        = olfactometer channel A shutoff valve
-%       P0.5        = olfactometer channel B shutoff valve
-%       P0.6        = olfactometer NO valve ("dummy") 
+%       AO.2        = speaker output
+%       P0.1        = olfactometer valve A/shutoff B
+%       P0.2        = olfactometer valve B/shutoff A
+%       P0.3        = olfactometer NO valve ("dummy") 
 %       P0.7        = camera trigger
 
 settings = sensor_settings;
@@ -94,26 +85,24 @@ imagingTrigger(2:end-1) = 1.0;
 %%
 
 outputData = [];
-% output_data = [imaging trigger, speaker, valve A, valve B, shutoff A, shutoff B, NO valve, cameraTrigger]
+% output_data = [imaging trigger, speaker, valve A/shutoff B, valve B/shutoff A, NO valve, cameraTrigger]
 if( strcmp(taskType, 'OdorA') == 1 )
-    outputData = [imagingTrigger, zeroStim, stimCommand, zeroStim, zeroStim, stimCommand, stimCommand, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, stimCommand, zeroStim, stimCommand, cameraTrigger];
 elseif( strcmp(taskType, 'OdorB') == 1 )
-    outputData = [imagingTrigger, zeroStim, zeroStim, stimCommand, stimCommand, zeroStim, stimCommand, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, zeroStim, stimCommand, stimCommand, cameraTrigger];
 elseif( strcmp(taskType, 'OdorAPair') == 1 )
-    outputData = [imagingTrigger, zeroStim, pulseStimCommand, zeroStim, zeroStim, pulseStimCommand, pulseStimCommand, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, pulseStimCommand, zeroStim, pulseStimCommand, cameraTrigger];
 elseif( strcmp(taskType, 'OdorBPair') == 1 )
-    outputData = [imagingTrigger, zeroStim, zeroStim, pulseStimCommand, pulseStimCommand, zeroStim, pulseStimCommand, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, zeroStim, pulseStimCommand, pulseStimCommand, cameraTrigger];
 elseif( strcmp(taskType, 'NoOdor') == 1 || strcmp(taskType, 'NoStim') == 1 )
-    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
 elseif( strcmp(taskType, 'AirStop') == 1)
-    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, stimCommand, cameraTrigger];
-elseif( strcmp(taskType, 'Laser') == 1)
-    outputData = [imagingTrigger, analogStimCommand, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, stimCommand, cameraTrigger];
 elseif( strcmp(taskType, 'Sound') == 1)
-    outputData = [imagingTrigger, speakerStimCommand, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
+    outputData = [imagingTrigger, speakerStimCommand, zeroStim, zeroStim, zeroStim, cameraTrigger];
 else
     disp('Warning: unrecognized stim type...running trial with no stim.')
-    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
+    outputData = [imagingTrigger, zeroStim, zeroStim, zeroStim, zeroStim, cameraTrigger];
 end
 
 outputData(end, :) = 0; % To make sure the stim doesn't stay on between trials
