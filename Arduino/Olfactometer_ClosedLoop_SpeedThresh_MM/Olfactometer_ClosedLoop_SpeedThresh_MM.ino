@@ -4,18 +4,27 @@
 
 // SET THESE VALUES
 int expThreshold = 700;
-int expThreshold2 = 100;
+const int avgWinSize = 100;
 
 int expActivePin = A0;
 int expActiveVal = 0;
 
 int ftYawPin = A1;
+int ftXPin = A2;
+int ftYPin = A3;
 int yawVal = 0;
 
 int speakerPin = 10;
 int odorAPin = 11;
 int odorBPin = 12;
 int NOValvePin = 13;
+
+// Set velocity threshold
+int velData[avgWinSize];
+int velIdx = 0;
+int velTotal = 0;
+int velAvg = 0;
+
 
 // Set odor window size and location (deg)
 int odorWindowYawPos1 = 0;
@@ -29,31 +38,50 @@ void setup() {
   pinMode(NOValvePin, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
+
+  // Initialize vel readings to zero
+  for (int iVel = 0; currVel < avgWinSize; iVel++) {
+    velData[iVel] = 0;
+  }
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-  yawVal = analogRead(ftYawPin);
+
+  // Read new 
+
+
+  // subtract the last reading:
+  total = velTotal - velData[velIdx];
+  // read from the sensor:
+  velData[velIdx] = analogRead(inputPin);
+  // add the reading to the total:
+  total = total + readings[readIndex];
+  // advance to the next position in the array:
+  readIndex = readIndex + 1;
+
+  // if we're at the end of the array...
+  if (readIndex >= numReadings) {
+    // ...wrap around to the beginning:
+    readIndex = 0;
+
+
+
   expActiveVal = analogRead(expActivePin);
-  Serial.println(yawVal);
 //  Serial.println(odorVolt1);
 //  Serial.println(odorWindowYawPos2);
 //  Serial.println(odorVolt2);
   Serial.println(expActiveVal);
   
-  if((expActiveVal > expThreshold) && (yawVal > odorVolt1) && (yawVal < odorVolt2))
+  if((expActiveVal > expThreshold) && (speedVal > odorVolt1) && (yawVal < odorVolt2))
   {
     Serial.println(1);
     digitalWrite(odorAPin, HIGH);
     digitalWrite(odorBPin, LOW);
     digitalWrite(NOValvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
-//  } else if ((expThreshold2 < expActiveVal < expThreshold) && (panelval > odorVolt1) && (panelval < odorVolt2))
-//  {
-//    digitalWrite(odorAPin, LOW);
-//    digitalWrite(odorBPin, HIGH);
-//    digitalWrite(NOValvePin, HIGH);
   } else 
   {
     digitalWrite(odorAPin, LOW);
