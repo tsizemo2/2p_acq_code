@@ -5,16 +5,12 @@
 // The library stores the last N individual values in a circular buffer,
 // to calculate the running average.
 //
-// NOTE: will only accept long integer inputs, but returns average as a float
-//
 
 #include "Running_Average.h"
 #include <stdlib.h>
 
-
 // Constructor function
-Running_Average::Running_Average(int winSize)
-{
+Running_Average::Running_Average(int winSize){
 	_size = winSize;
 	_arr = (float*) malloc(_size * sizeof(float)); // Allocate memory for array (_arr is pointer to the array)
 	if (_arr == NULL){ _size = 0; }
@@ -22,14 +18,12 @@ Running_Average::Running_Average(int winSize)
 }
 
 // Destructor function
-Running_Average::~Running_Average()
-{
+Running_Average::~Running_Average(){
     if (_arr != NULL) { free(_arr); }
 }
 
 // Reset counters
-void Running_Average::clear()
-{
+void Running_Average::clear(){
     _count = 0;
     _idx = 0;
     _sum = 0.0;
@@ -37,14 +31,12 @@ void Running_Average::clear()
 }
 
 // Subtract an integer value from entire array
-void Running_Average::decrement(inputNum)
-{
+void Running_Average::decrement(inputNum){
 	for (int i = 0; i< _size; i++) { _arr[i] -= inputNum; }
 }
 
 // Add a new value to the array
-void Running_Average::addValue(float inputValue)
-{
+void Running_Average::addValue(float inputValue){
     if (_ar == NULL) return;  			// Abort if array is invalid
     _sum -= _arr[_idx];       			// Subtract last reading from the total
     _arr[_idx] = inputValue;  			// Add newest value to array       
@@ -55,8 +47,7 @@ void Running_Average::addValue(float inputValue)
 }
 
 // Calculate and return current average of the array
-float Running_Average::getAvg
-{
+float Running_Average::getAvg{
 	if (_count == 0) { return NAN; }
 	return _sum / _count; 
 }

@@ -8,11 +8,11 @@
 
 // GLOBAL PARAMETERS
 const int expThreshold = 700;
-const int spdThresh = 100;  // Combined movement threshold for stim presentation, in rad/sampPeriod (suggested: 0.05 total abs(radian) across 3 axes per 200 msec)
-const int sampPeriod = 25; // Period for analog read sampling rate in msec
-const int jumpTol = 500;    // Minimum jump size to be considered wrapping (out of 1024 max)
-const int avgWin_1 = 8;     // Smoothing window size for running average of integrated position data
-const int avgWin_2 = 4; 	// Smoothing window size for running average of speed data	
+const int spdThresh = 100;  	// Combined movement threshold for stim presentation, in Ain values/sample period
+const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
+const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
+const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data
+const int avgWin_2 = 4; 		// Smoothing window size (in samples) for running average of speed data	
 
 // Set pin names
 const int expActivePin = A0;
@@ -27,9 +27,6 @@ const int odorBPin = 12;
 const int NOValvePin = 13;
 
 // Initialize raw data variables
-long newX = 0;
-long newY = 0;
-long newYaw = 0;
 long oldX = 0;
 long oldY = 0;
 long oldYaw = 0;
@@ -42,21 +39,13 @@ Unwrapper unwrapperX(jumpTol, 1024);
 Unwrapper unwrapperY(jumpTol, 1024);
 Unwrapper unwrapperYaw(jumpTol, 1024);
 
-// Initialize arrays for running averages
+// Initialize running average objects
 Running_Average avgIntX(avgWin_1);
 Running_Average avgIntY(avgWin_1);
 Running_Average avgIntYaw(avgWin_1);
 Running_Average avgSpdX(avgWin_2);
 Running_Average avgSpdY(avgWin_2);
 Running_Average avgSpdYaw(avgWin_2);
-
-// Initialize comparison variables
-float xSpd = 0;
-float ySpd = 0;
-float yawSpd = 0;
-
-// Initialize summing variable
-float sumSpd = 0;
 
 // Set up pins
 void setup() {
@@ -78,12 +67,12 @@ void loop() {
   
 } // end loop
 
-void read_sample() {
+void read_sample() { 
   
   // Read new input data 
-  newX = analogRead(ftXPin);
-  newY = analogRead(ftYPin);
-  newYaw = analogRead(ftYawPin);
+  int newX = analogRead(ftXPin);
+  int newY = analogRead(ftYPin);
+  int newYaw = analogRead(ftYawPin);
   
   // Unwrap if necessary
   newX = unwrapperX.unwrap(newX);
@@ -118,9 +107,9 @@ void read_sample() {
   avgSpdYaw.addValue(avgIntYaw.getAvg() - oldYawAvg);
   
   // Get averaged speed values 
-  xSpd = avgSpdX.getAvg();
-  YSpd = avgSpdY.getAvg();
-  YawSpd = avgSpdYaw.getAvg();
+  float xSpd = avgSpdX.getAvg();
+  float ySpd = avgSpdY.getAvg();
+  float yawSpd = avgSpdYaw.getAvg();
   
   // Update old position values
   oldXAvg = avgIntX.getAvg();
@@ -128,10 +117,8 @@ void read_sample() {
   oldYawAvg = avgIntYaw.getAvg(); 
   
   // Sum axes
-  sumSpd = oldXAvg + oldYAvg + oldYawAvg;
-  
-  // Convert speed threshold into rad/sampPeriod
-  
+  float sumSpd = xSpd + ySpd + yawSpd;
+    
   // See if CL is activated
   expActiveVal = analogRead(expActivePin);
 
