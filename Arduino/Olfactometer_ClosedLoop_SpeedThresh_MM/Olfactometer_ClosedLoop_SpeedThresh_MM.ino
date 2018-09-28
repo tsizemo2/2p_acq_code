@@ -7,7 +7,7 @@
  #include <Unwrapper.h>
 
 // GLOBAL PARAMETERS
-const int expThreshold = 700;
+const int expThreshold = -700;
 const int spdThresh = 100;  	// Combined movement threshold for stim presentation, in Ain values/sample period
 const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
@@ -16,7 +16,7 @@ const int avgWin_2 = 4; 		// Smoothing window size (in samples) for running aver
 
 // Set pin names
 const int expActivePin = A0;
-const int expActiveVal = 0;
+int expActiveVal = 0;
 const int ftYawPin = A1;
 const int ftXPin = A2;
 const int ftYPin = A3;
@@ -30,6 +30,9 @@ const int NOValvePin = 13;
 long oldX = 0;
 long oldY = 0;
 long oldYaw = 0;
+float oldXAvg = 0;
+float oldYAvg = 0;
+float oldYawAvg = 0;
 
 // Initialize counter timing
 unsigned long last_msec = 0L;
