@@ -43,8 +43,7 @@ s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
 %       AO.0        = closed loop activation output
 %       P0.7        = camera trigger
 
-settings = sensor_settings;
-SAMPLING_RATE = settings.sampRate;
+SAMPLING_RATE = 4000;
 s.Rate = SAMPLING_RATE;
 FRAME_RATE = 25; % This is the behavior camera frame rate
 
