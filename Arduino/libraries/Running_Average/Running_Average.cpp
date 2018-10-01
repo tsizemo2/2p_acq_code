@@ -47,7 +47,7 @@ void Running_Average::addValue(float inputValue){
 }
 
 // Subtract an integer value from entire array
-void Running_Average::decrement(inputNum){
+void Running_Average::decrement(int inputNum){
 	for (int i = 0; i< _size; i++) { _arr[i] -= inputNum; }
 }
 
