@@ -11,7 +11,7 @@ class Running_Average
 		
 		void clear();
 		void addValue(float);
-		void decrement(int);
+		void decrement(int inputNum);
 		float getAvg();
 		uint8_t getSize() { return _size; }
 		uint8_t getCount() { return _count; }

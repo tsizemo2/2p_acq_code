@@ -34,14 +34,14 @@ long Unwrapper::unwrap(int inputValue)
 			{
 				if (inputValue < _oldValue)
 				{
-					wrapCount += 1;
-					oldValue = inputValue;
+					_wrapCount += 1;
+					_oldValue = inputValue;
 					return (long)(inputValue + (_range * _wrapCount));
 				}else
 				{
-					wrapCount -= 1;
-					oldValue = inputValue;
-					return (long)(inputValue + (_range * wrapCount));
+					_wrapCount -= 1;
+					_oldValue = inputValue;
+					return (long)(inputValue + (_range * _wrapCount));
 				}
 			}else
 			{
