@@ -31,13 +31,13 @@ void Running_Average::clear(){
 }
 
 // Subtract an integer value from entire array
-void Running_Average::decrement(inputNum){
+void Running_Average::decrement(int inputNum){
 	for (int i = 0; i< _size; i++) { _arr[i] -= inputNum; }
 }
 
 // Add a new value to the array
 void Running_Average::addValue(float inputValue){
-    if (_ar == NULL) return;  			// Abort if array is invalid
+    if (_arr == NULL) return;  			// Abort if array is invalid
     _sum -= _arr[_idx];       			// Subtract last reading from the total
     _arr[_idx] = inputValue;  			// Add newest value to array       
     _sum += _arr[_idx];		  			// Add the new value to the total
@@ -47,7 +47,7 @@ void Running_Average::addValue(float inputValue){
 }
 
 // Calculate and return current average of the array
-float Running_Average::getAvg{
+float Running_Average::getAvg(){
 	if (_count == 0) { return NAN; }
 	return _sum / _count; 
 }
