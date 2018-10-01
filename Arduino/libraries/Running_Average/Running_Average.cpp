@@ -30,14 +30,11 @@ void Running_Average::clear(){
     for (int i = 0; i< _size; i++) { _arr[i] = 0; }  // Fill array with zeros
 }
 
-<<<<<<< HEAD
-=======
 // Subtract an integer value from entire array
 void Running_Average::decrement(int inputNum){
 	for (int i = 0; i< _size; i++) { _arr[i] -= inputNum; }
 }
 
->>>>>>> ac5ba9d7156236756e618f0964dda71428201666
 // Add a new value to the array
 void Running_Average::addValue(float inputValue){
     if (_arr == NULL) return;  			// Abort if array is invalid
