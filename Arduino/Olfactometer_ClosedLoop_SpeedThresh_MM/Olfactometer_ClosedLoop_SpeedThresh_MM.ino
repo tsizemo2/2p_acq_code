@@ -4,15 +4,14 @@
  */
  
  #include <Running_Average.h>
- #include <Unwrapper.h>
 
 // GLOBAL PARAMETERS
 const int expThreshold = -700;
 const int spdThresh = 100;  	// Combined movement threshold for stim presentation, in Ain values/sample period
 const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
-const int avgWin_1 = 10;     	// Smoothing window size (in samples) for running average of integrated position data
-const int avgWin_2 = 8; 		// Smoothing window size (in samples) for running average of speed data	
+const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data
+const int avgWin_2 = 4; 		// Smoothing window size (in samples) for running average of speed data	
 
 // Set pin names
 const int expActivePin = A0;
@@ -33,14 +32,10 @@ long oldYaw = 0;
 float oldXAvg = 0;
 float oldYAvg = 0;
 float oldYawAvg = 0;
+int stimOn = 0;
 
 // Initialize counter timing
 unsigned long last_msec = 0L;
-
-// Initialize unwrapper objects
-Unwrapper unwrapperX(jumpTol, 1024);  
-Unwrapper unwrapperY(jumpTol, 1024);
-Unwrapper unwrapperYaw(jumpTol, 1024);
 
 // Initialize running average objects
 Running_Average avgIntX(avgWin_1);
@@ -73,53 +68,39 @@ void loop() {
 
 void read_sample() { 
   
-  // Read new input data 
+  // Read new input data
+  oldX = newX;
+  oldY = newY;
+  oldYaw = newYaw;
   int newX = analogRead(ftXPin);
   int newY = analogRead(ftYPin);
-  int newYaw = analogRead(ftYawPin);
+  int newYaw = analogRead(ftYawPin);  
   
-  // Unwrap if necessary
-  newX = unwrapperX.unwrap(newX);
-  newY = unwrapperY.unwrap(newY);
-  newYaw = unwrapperYaw.unwrap(newYaw);
+  // Reset arrays if any of the inputs has looped around at 0 or 1024
+  if (abs(oldX - newX) > jumpTol) { avgIntX.clear(); }
+  if (abs(oldY - newY) > jumpTol) { avgIntY.clear(); }  
+  if (abs(oldYaw - newYaw) > jumpTol) { avgIntYaw.clear(); }
   
-  // Decrement numbers if needed so they don't get too big for floating point math
-  if (newX > 500000){
-	  avgIntX.decrement(500000);
-	  newX -= 500000;
-	  oldXAvg -= 500000;
-  }
-  if (newY > 500000){
-	  avgIntY.decrement(500000);
-	  newY -= 500000;
-	  oldYAvg -= 500000;
-  }  
-  if (newYaw > 500000){
-	  avgIntYaw.decrement(500000);
-	  newYaw -= 500000;
-	  oldYawAvg -= 500000;
-  }  
-  
-  // Put unwrapped inputs into position smoothing arrays
+  // Put the inputs into position smoothing arrays
   avgIntX.addValue((float)newX);
   avgIntY.addValue((float)newY);
   avgIntYaw.addValue((float)newYaw);
-  Serial.println(oldYawAvg);
+    
+  // If running averages have at least 2 inputs in them, convert averaged sample to speed 
+  // and add to second set of smoothing arrays
+  if (avgIntX.getCount() >= 2 { avgSpdX.addValue(abs(avgIntX.getAvg() - oldXAvg)); }
+  if (avgIntY.getCount() >= 2 { avgSpdY.addValue(abs(avgIntY.getAvg() - oldYAvg)); }
+  if (avgIntYaw.getCount() >= 2 { avgSpdYaw.addValue(abs(avgIntYaw.getAvg() - oldYawAvg)); }
   
-  // Convert averaged sample to speed and add to second smoothing arrays
-  avgSpdX.addValue(abs(avgIntX.getAvg() - oldXAvg));
-  avgSpdY.addValue(abs(avgIntY.getAvg() - oldYAvg));
-  avgSpdYaw.addValue(abs(avgIntYaw.getAvg() - oldYawAvg));
+  // Update old position values
+  oldXAvg = avgIntX.getAvg(); 
+  oldYAvg = avgIntY.getAvg(); 
+  oldYawAvg = avgIntYaw.getAvg(); 
   
   // Get averaged speed values 
   float xSpd = avgSpdX.getAvg();
   float ySpd = avgSpdY.getAvg();
   float yawSpd = avgSpdYaw.getAvg();
-  
-  // Update old position values
-  oldXAvg = avgIntX.getAvg();
-  oldYAvg = avgIntY.getAvg();
-  oldYawAvg = avgIntYaw.getAvg(); 
   
   // Sum axes
   float sumSpd = xSpd + ySpd + yawSpd;
@@ -128,14 +109,13 @@ void read_sample() {
   expActiveVal = analogRead(expActivePin);
 
   // Set olfactometer command pins to appropriate values
-//  Serial.println(sumSpd);
   if((expActiveVal > expThreshold) && (sumSpd > spdThresh))
   {
 //    Serial.println(1);
     digitalWrite(odorAPin, HIGH);
     digitalWrite(odorBPin, LOW);
     digitalWrite(speakerPin, LOW);
-	  digitalWrite(NOValvePin, HIGH);
+	digitalWrite(NOValvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
   } else 
   {
