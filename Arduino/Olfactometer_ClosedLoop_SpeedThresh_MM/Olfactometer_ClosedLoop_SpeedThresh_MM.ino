@@ -11,8 +11,8 @@ const int expThreshold = -700;
 const int spdThresh = 100;  	// Combined movement threshold for stim presentation, in Ain values/sample period
 const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
-const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data
-const int avgWin_2 = 4; 		// Smoothing window size (in samples) for running average of speed data	
+const int avgWin_1 = 10;     	// Smoothing window size (in samples) for running average of integrated position data
+const int avgWin_2 = 8; 		// Smoothing window size (in samples) for running average of speed data	
 
 // Set pin names
 const int expActivePin = A0;
@@ -55,6 +55,7 @@ void setup() {
   pinMode(odorAPin, OUTPUT);
   pinMode(odorBPin, OUTPUT);
   pinMode(NOValvePin, OUTPUT);
+  pinMode(speakerPin, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
 }
@@ -103,11 +104,12 @@ void read_sample() {
   avgIntX.addValue((float)newX);
   avgIntY.addValue((float)newY);
   avgIntYaw.addValue((float)newYaw);
+  Serial.println(oldYawAvg);
   
   // Convert averaged sample to speed and add to second smoothing arrays
-  avgSpdX.addValue(avgIntX.getAvg() - oldXAvg);
-  avgSpdY.addValue(avgIntY.getAvg() - oldYAvg);
-  avgSpdYaw.addValue(avgIntYaw.getAvg() - oldYawAvg);
+  avgSpdX.addValue(abs(avgIntX.getAvg() - oldXAvg));
+  avgSpdY.addValue(abs(avgIntY.getAvg() - oldYAvg));
+  avgSpdYaw.addValue(abs(avgIntYaw.getAvg() - oldYawAvg));
   
   // Get averaged speed values 
   float xSpd = avgSpdX.getAvg();
@@ -126,13 +128,14 @@ void read_sample() {
   expActiveVal = analogRead(expActivePin);
 
   // Set olfactometer command pins to appropriate values
+//  Serial.println(sumSpd);
   if((expActiveVal > expThreshold) && (sumSpd > spdThresh))
   {
 //    Serial.println(1);
     digitalWrite(odorAPin, HIGH);
     digitalWrite(odorBPin, LOW);
     digitalWrite(speakerPin, LOW);
-	digitalWrite(NOValvePin, HIGH);
+	  digitalWrite(NOValvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
   } else 
   {
