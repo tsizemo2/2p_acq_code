@@ -122,6 +122,7 @@ void read_sample() {
     digitalWrite(speakerPin, LOW);
 	digitalWrite(NOValvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
+	stimOnTime = millis();
 } else if ((expActiveVal < expThreshold) || (millis() - stimOnTime) > minStimTime)
   {
     digitalWrite(odorAPin, LOW);
