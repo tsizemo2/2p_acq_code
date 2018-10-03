@@ -7,11 +7,11 @@
 
 // GLOBAL PARAMETERS
 const int expThreshold = -700;
-const int spdThresh = 100;  	// Combined movement threshold for stim presentation, in Ain values/sample period
+const int spdThresh = 2;  	// Combined movement threshold for stim presentation, in Ain values/sample period
 const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
 const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data
-const int avgWin_2 = 4; 		// Smoothing window size (in samples) for running average of speed data	
+const int avgWin_2 = 8; 		// Smoothing window size (in samples) for running average of speed data	
 
 // Set pin names
 const int expActivePin = A0;
@@ -29,6 +29,9 @@ const int NOValvePin = 13;
 long oldX = 0;
 long oldY = 0;
 long oldYaw = 0;
+int newX = 0;
+int newY = 0;
+int newYaw = 0;
 float oldXAvg = 0;
 float oldYAvg = 0;
 float oldYawAvg = 0;
@@ -72,9 +75,9 @@ void read_sample() {
   oldX = newX;
   oldY = newY;
   oldYaw = newYaw;
-  int newX = analogRead(ftXPin);
-  int newY = analogRead(ftYPin);
-  int newYaw = analogRead(ftYawPin);  
+  newX = analogRead(ftXPin);
+  newY = analogRead(ftYPin);
+  newYaw = analogRead(ftYawPin);  
   
   // Reset arrays if any of the inputs has looped around at 0 or 1024
   if (abs(oldX - newX) > jumpTol) { avgIntX.clear(); }
@@ -88,9 +91,9 @@ void read_sample() {
     
   // If running averages have at least 2 inputs in them, convert averaged sample to speed 
   // and add to second set of smoothing arrays
-  if (avgIntX.getCount() >= 2 { avgSpdX.addValue(abs(avgIntX.getAvg() - oldXAvg)); }
-  if (avgIntY.getCount() >= 2 { avgSpdY.addValue(abs(avgIntY.getAvg() - oldYAvg)); }
-  if (avgIntYaw.getCount() >= 2 { avgSpdYaw.addValue(abs(avgIntYaw.getAvg() - oldYawAvg)); }
+  if (avgIntX.getCount() >= 2) { avgSpdX.addValue(abs(avgIntX.getAvg() - oldXAvg)); }
+  if (avgIntY.getCount() >= 2) { avgSpdY.addValue(abs(avgIntY.getAvg() - oldYAvg)); }
+  if (avgIntYaw.getCount() >= 2) { avgSpdYaw.addValue(abs(avgIntYaw.getAvg() - oldYawAvg)); }
   
   // Update old position values
   oldXAvg = avgIntX.getAvg(); 
@@ -104,7 +107,7 @@ void read_sample() {
   
   // Sum axes
   float sumSpd = xSpd + ySpd + yawSpd;
-    
+  Serial.println(sumSpd);
   // See if CL is activated
   expActiveVal = analogRead(expActivePin);
 
