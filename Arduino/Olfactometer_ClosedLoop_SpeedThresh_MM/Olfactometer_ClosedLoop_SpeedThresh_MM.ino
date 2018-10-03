@@ -12,6 +12,7 @@ const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
 const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data
 const int avgWin_2 = 8; 		// Smoothing window size (in samples) for running average of speed data	
+const int minStimTime = 500;    // Minimum time that stim will stay on in msec
 
 // Set pin names
 const int expActivePin = A0;
@@ -39,6 +40,7 @@ int stimOn = 0;
 
 // Initialize counter timing
 unsigned long last_msec = 0L;
+unsigned long stimOnTime = 0L;
 
 // Initialize running average objects
 Running_Average avgIntX(avgWin_1);
@@ -120,7 +122,7 @@ void read_sample() {
     digitalWrite(speakerPin, LOW);
 	digitalWrite(NOValvePin, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
-  } else 
+} else if ((expActiveVal < expThreshold) || (millis() - stimOnTime) > minStimTime)
   {
     digitalWrite(odorAPin, LOW);
     digitalWrite(odorBPin, LOW);
