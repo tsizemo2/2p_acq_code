@@ -87,29 +87,33 @@ imagingTrigger(2:end-1) = 1.0;
 %%
 
 outputData = [];
-      % output_data =   [imaging trigger,   speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
+% output_data =     [imaging trigger,   speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
 switch taskType
     case 'OdorA'
         outputData =    [imagingTrigger,    zeroStim,           stimCommand,        zeroStim,           stimCommand,        cameraTrigger];
     case 'OdorB'
         outputData =    [imagingTrigger,    zeroStim,           zeroStim,           stimCommand,        stimCommand,        cameraTrigger];
-    case 'OdorAPair'
+    case 'OdorAPair') == 1 )
         outputData =    [imagingTrigger,    zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   cameraTrigger];
-    case 'OdorBPair'
+    elseif( strcmp(taskType, 'OdorBPair') == 1 )
         outputData =    [imagingTrigger,    zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   cameraTrigger];
-    case 'OdorABPair'
+    elseif( strcmp(taskType, 'OdorABPair') == 1 )
         outputData =    [imagingTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   cameraTrigger];
-    case 'OdorBAPair'
+    elseif( strcmp(taskType, 'OdorBAPair') == 1 )
         outputData =    [imagingTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   cameraTrigger];
-    case {'NoOdor', 'NoStim'}
+    elseif( strcmp(taskType, 'NoOdor') == 1 || strcmp(taskType, 'NoStim') == 1 )
         outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
-    case 'AirStop'
+    elseif( strcmp(taskType, 'AirStop') == 1)
         outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           stimCommand,        cameraTrigger];
-    case 'Sound'
+    elseif( strcmp(taskType, 'Sound') == 1)
         outputData =    [imagingTrigger,    speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
-    otherwise
-        disp('Warning: unrecognized stim type...running trial with no stim.')
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+        
+    end
+
+
+else
+    disp('Warning: unrecognized stim type...running trial with no stim.')
+    outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
 end
 
 outputData(end, :) = 0; % To make sure the stim doesn't stay on between trials
