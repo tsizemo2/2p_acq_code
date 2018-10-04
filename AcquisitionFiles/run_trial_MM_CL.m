@@ -22,7 +22,7 @@ for i=1:length(ai_channels_used)
 end
 
 % Add closed loop activation output channel
-s.addAnalogOutputChannel('Dev1', 0, 'Voltage');
+s.addAnalogOutputChannel('Dev1', 1, 'Voltage');
 
 % Add output channel for camera trigger (7)
 s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
@@ -40,7 +40,7 @@ s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
 %
 %   Dev1:
 %       P0.0        = external trigger for scanimage
-%       AO.0        = closed loop activation output
+%       AO.1        = closed loop activation output
 %       P0.7        = camera trigger
 
 SAMPLING_RATE = 4000;
