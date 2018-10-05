@@ -1,4 +1,4 @@
-function [ trial_data, trial_time, outputData ] = run_trial_MM( tasks, run_obj, scanimage_client, trialCoreName )
+function [ trial_data, outputData ] = run_trial_MM( tasks, run_obj, scanimage_client, trialCoreName )
 
 global s
 
@@ -117,24 +117,24 @@ imagingTrigger = zeros(size(allOutputData, 1), 1);
 imagingTrigger(2:end-1) = 1;
 allOutputData = [imagingTrigger, allOutputData];
 
-
 outputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
 queueOutputData(s, outputData);
 
 % Trigger scanimage run if using 2p.
 if(run_obj.using2P == 1)
     scanimage_file_str = ['cdata_' trialCoreName '_tt_', num2str(run_obj.trialDuration), '_'];
-    fprintf(canimage_client, [num2str(nTrials));
+    fprintf(scanimage_client, ['nTrials: ', num2str(nTrials)]);
+    fprintf(scanimage_client, ['trialDuration: ', num2str(trialDuration)]);
     fprintf(scanimage_client, [scanimage_file_str]);
     disp(['Wrote: ' scanimage_file_str ' to scanimage server' ]);
     acq = fscanf(scanimage_client, '%s');
     disp(['Read acq: ' acq ' from scanimage server' ]);
 end
 
-% Delay starting the aquisition for a second to ensure that scanimage is ready
+% Delay starting the aquisition for 2 seconds to ensure that scanimage is ready
 pause(1.0);
 
-[trial_data, trial_time] = s.startForeground();
+[trial_data, ~] = s.startForeground();
 
 release(s);
 end

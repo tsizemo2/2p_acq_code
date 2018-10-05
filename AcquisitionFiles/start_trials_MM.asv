@@ -31,7 +31,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     delete('C:\tmp\*.tif');
     
     % Run trials
-    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_block_', ];
+    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_', currTask];
     allTasks = cellfun(@(x) regexprep(x, '_', '-'), tasks, 'UniformOutput', 0);
     if contains(currTask, 'Closed_Loop')
         [~, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
@@ -73,6 +73,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         fprintf(scanimage_client_skt, 'END_OF_SESSION');
         fclose(scanimage_client_skt);
     end
+           
     disp('Trials complete.')
 else
     disp(STIM_TYPE);

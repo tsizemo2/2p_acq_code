@@ -1,8 +1,6 @@
-function [ trial_data, trial_time, outputData ] = run_trial_MM( task, run_obj, scanimage_client, trialCoreName )
+function [ trial_data, trial_time, outputData ] = run_trial_MM( tasks, run_obj, scanimage_client, trialCoreName )
 
 global s
-
-disp(['About to start trial task: ' task]);
 
 % Setup data structures for read / write on the daq board
 s = daq.createSession('ni');
@@ -38,93 +36,103 @@ settings = sensor_settings;
 SAMPLING_RATE = settings.sampRate;
 s.Rate = SAMPLING_RATE;
 FRAME_RATE = 25; % This is the behavior camera frame rate
+nTrials = run_obj.nTrials;
+trialDuration = run_obj.trialDuration;
+blockDuration = trialDuration * nTrials;
 
-% Parse task name
-taskDivs = strfind(task, '-');
-taskType = task(1:taskDivs(1)-1);
-stimOnset = str2double(task(taskDivs(2)+1:taskDivs(3)-1));
-stimDur = str2double(task(taskDivs(4)+1:end));
+allOutputData = [];
+for iTrial = 1:nTrials
+    
+    % Parse task name
+    currTask = tasks{iTrial};
+    taskDivs = strfind(currTask, '-');
+    taskType = currTask(1:taskDivs(1)-1);
+    stimOnset = str2double(currTask(taskDivs(2)+1:taskDivs(3)-1));
+    stimDur = str2double(currTask(taskDivs(4)+1:end));
+    
+    % Initialize the output vectors to zero
+    zeroStim = zeros(SAMPLING_RATE * trialDuration, 1);
+    stimCommand = zeroStim;
+    cameraTrigger = zeroStim;
 
-% Initialize the output vectors to zero
-zeroStim = zeros(SAMPLING_RATE * run_obj.trialDuration, 1);
-stimCommand = zeroStim;
-cameraTrigger = zeroStim;
+    % Set up stim output
+    stimStartTime = stimOnset;
+    stimEndTime = stimStartTime + stimDur;
+    pairStimStartTime = stimEndTime + stimDur;
+    pairStimEndTime = pairStimStartTime + stimDur;
+    stimStartSample = round(stimStartTime * SAMPLING_RATE);
+    stimEndSample = round(stimEndTime * SAMPLING_RATE);
+    pairStimStartSample = round(pairStimStartTime * SAMPLING_RATE);
+    pairStimEndSample = round(pairStimEndTime * SAMPLING_RATE);
 
-% Set up stim output
-stimStartTime = stimOnset;
-stimEndTime = stimStartTime + stimDur;
-pairStimStartTime = stimEndTime + stimDur;
-pairStimEndTime = pairStimStartTime + stimDur;
-stimStartSample = round(stimStartTime * SAMPLING_RATE);
-stimEndSample = round(stimEndTime * SAMPLING_RATE);
-pairStimStartSample = round(pairStimStartTime * SAMPLING_RATE);
-pairStimEndSample = round(pairStimEndTime * SAMPLING_RATE);
+    % Create stim output vectors
+    stimCommand(stimStartSample:stimEndSample) = 1;
+    pulseStimCommand = stimCommand;
+    latePulseCommand = zeroStim;
+    analogStimCommand = stimCommand * 10;
+    pulseStimCommand(pairStimStartSample:pairStimEndSample) = 1;
+    latePulseCommand((pairStimStartSample:pairStimEndSample) = 1;
 
-% Create stim output vectors
-stimCommand(stimStartSample:stimEndSample) = 1;
-pulseStimCommand = stimCommand;
-latePulseCommand = zeroStim;
-analogStimCommand = stimCommand * 10;
-pulseStimCommand(pairStimStartSample:pairStimEndSample) = 1;
-latePulseCommand((pairStimStartSample:pairStimEndSample) = 1;
+    % Create speaker output vector
+    speakerStimCommand = zeroStim;
+    f = 200;
+    ts = 1/SAMPLING_RATE;
+    t = 0:ts:stimDur;
+    sineTone = sin(2*pi*f*t) * 10;
+    speakerStimCommand(stimStartSample:stimEndSample) = sineTone;
+    
+    % Set up camera trigger output
+    triggerInterval = round(SAMPLING_RATE / FRAME_RATE);
+    cameraTrigger(1:triggerInterval:end) = 1;
 
-% Create speaker output vector
-speakerStimCommand = zeroStim;
-f = 200;
-ts = 1/SAMPLING_RATE;
-t = 0:ts:stimDur;
-sineTone = sin(2*pi*f*t) * 10;
-speakerStimCommand(stimStartSample:stimEndSample) = sineTone;
-
-
-% Set up camera trigger output
-triggerInterval = round(SAMPLING_RATE / FRAME_RATE);
-cameraTrigger(1:triggerInterval:end) = 1;
+    % output_data =         [speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
+    switch taskType
+        case 'OdorA'
+            outputData =    [zeroStim,           stimCommand,        zeroStim,           stimCommand,        cameraTrigger];
+        case 'OdorB'
+            outputData =    [zeroStim,           zeroStim,           stimCommand,        stimCommand,        cameraTrigger];
+        case 'OdorAPair'
+            outputData =    [zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   cameraTrigger];
+        case 'OdorBPair'
+            outputData =    [zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   cameraTrigger];
+        case 'OdorABPair'
+            outputData =    [zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   cameraTrigger];
+        case 'OdorBAPair'
+            outputData =    [zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   cameraTrigger];
+        case {'NoOdor', 'NoStim'}
+            outputData =    [zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+        case 'AirStop'
+            outputData =    [zeroStim,           zeroStim,           zeroStim,           stimCommand,        cameraTrigger];
+        case 'Sound'
+            outputData =    [speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+        otherwise
+            disp('Warning: unrecognized stim type...running trial with no stim.')
+            outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+    end
+    allOutputData = cat(1, allOutputData, outputData);
+end%iTrial
 
 % Set up scanimage trigger
-imagingTrigger = zeroStim;
-imagingTrigger(2:end-1) = 1.0;
-%%
+imagingTrigger = zeros(size(allOutputData, 1), 1);
+imagingTrigger(2:end-1) = 1;
+allOutputData = [imagingTrigger, allOutputData];
 
-outputData = [];
-      % output_data =   [imaging trigger,   speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
-switch taskType
-    case 'OdorA'
-        outputData =    [imagingTrigger,    zeroStim,           stimCommand,        zeroStim,           stimCommand,        cameraTrigger];
-    case 'OdorB'
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           stimCommand,        stimCommand,        cameraTrigger];
-    case 'OdorAPair'
-        outputData =    [imagingTrigger,    zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   cameraTrigger];
-    case 'OdorBPair'
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   cameraTrigger];
-    case 'OdorABPair'
-        outputData =    [imagingTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   cameraTrigger];
-    case 'OdorBAPair'
-        outputData =    [imagingTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   cameraTrigger];
-    case {'NoOdor', 'NoStim'}
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
-    case 'AirStop'
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           stimCommand,        cameraTrigger];
-    case 'Sound'
-        outputData =    [imagingTrigger,    speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
-    otherwise
-        disp('Warning: unrecognized stim type...running trial with no stim.')
-        outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
-end
 
-outputData(end, :) = 0; % To make sure the stim doesn't stay on between trials
+outputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
 queueOutputData(s, outputData);
 
 % Trigger scanimage run if using 2p.
 if(run_obj.using2P == 1)
     scanimage_file_str = ['cdata_' trialCoreName '_tt_', num2str(run_obj.trialDuration), '_'];
+    fprintf(scanimage_client, ['nTrials: ', num2str(nTrials)]);
+    fprintf(scanimage_client, ['trialDuration: ', num2str(trialDuration)]);
     fprintf(scanimage_client, [scanimage_file_str]);
     disp(['Wrote: ' scanimage_file_str ' to scanimage server' ]);
     acq = fscanf(scanimage_client, '%s');
     disp(['Read acq: ' acq ' from scanimage server' ]);
 end
 
-% Delay starting the aquisition for a second to ensure that scanimage is ready
+% Delay starting the aquisition for 2 seconds to ensure that scanimage is ready
 pause(1.0);
 
 [trial_data, trial_time] = s.startForeground();
