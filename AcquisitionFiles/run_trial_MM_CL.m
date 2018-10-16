@@ -10,19 +10,15 @@ s = daq.createSession('ni');
 % This channel is for external triggering of scanimage 5.1
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
-% Add dummy analog input channel just to use its clock (might be FicTrac X
-% movement)
-s.addAnalogInputChannel('Dev1', 0, 'Voltage');
-
 % Add analog input channels for FicTrac data
-ai_channels_used = [5:7, 14:15];
+ai_channels_used = [5:7, 13:15];
 aI = s.addAnalogInputChannel('Dev1', ai_channels_used, 'Voltage');
 for i=1:length(ai_channels_used)
     aI(i).InputType = 'SingleEnded';
 end
 
 % Add closed loop activation output channel
-s.addAnalogOutputChannel('Dev1', 1, 'Voltage');
+s.addAnalogOutputChannel('Dev1', 3, 'Voltage');
 
 % Add output channel for camera trigger (7)
 s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
@@ -30,17 +26,18 @@ s.addDigitalChannel('Dev1', ['port0/line7'], 'OutputOnly');
 % Input channels:
 %
 %   Dev1:
-%       AI.5 = olfactometer valve A/shutoff B command
-%       AI.6 = olfactometer valve B/shutoff A command
-%       AI.7 = olfactometer NO valve command
-%       AI.14 = FicTrac Yaw
-%       AI.15 = FicTrac XY
+%       AI.5 = FicTrac X
+%       AI.6 = FicTrac Y
+%       AI.7 = FicTrac Yaw
+%       AI.13 = olfactometer valve A/shutoff B command
+%       AI.14 = olfactometer valve B/shutoff A command
+%       AI.15 = olfactometer NO valve command
 %
 % Output channels:
 %
 %   Dev1:
 %       P0.0        = external trigger for scanimage
-%       AO.1        = closed loop activation output
+%       AO.3        = closed loop activation output
 %       P0.7        = camera trigger
 
 SAMPLING_RATE = 4000;

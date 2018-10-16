@@ -16,6 +16,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     scanimage_client_skt = '';
     if run_obj.using2P
         scanimage_client_skt = connect_to_scanimage();
+%         fopen(scanimage_client_skt);
         disp('Connected to scanimage server');
     end
 
@@ -37,7 +38,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         
         % Run trial
         tic
-        if contains(currTask, 'Closed_Loop')
+        if contains(currTask, 'Closed-Loop')
             [fictracData, trial_time, outputData] = run_trial_MM_CL(currTask, run_obj, scanimage_client_skt, currTrialCoreName );
         else
             [fictracData, trial_time, outputData] = run_trial_MM(currTask, run_obj, scanimage_client_skt, currTrialCoreName );
