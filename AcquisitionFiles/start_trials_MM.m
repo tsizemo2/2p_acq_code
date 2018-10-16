@@ -30,16 +30,30 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     end
     delete('C:\tmp\*.tif');
     
+    % Figure out what the next block number should be
+    dirNames = [];
+    dirFiles = dir(run_obj.expDir);
+    for iFile = 1:length(dirFiles)
+        if dirFiles(iFile).isDir
+            dirNames{end + 1} = dirFiles(iFile).name;
+        end
+    end
+    regExpStr = ['(?<=sid_', num2str(sid), '_bid_).*(?=_tid)'];
+    blockNums = cellfun(@regexp, dirNames, ...
+                                repmat({regExpStr}, 1, numel(dirNames)), ...
+                                repmat({'match'}, 1, numel(dirNames)));
+    currBlock = num2str(max(str2double(blockNums)) + 1);
+    
     % Run trials
-    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_block_', ];
+    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_bid_', currBlock];
     allTasks = cellfun(@(x) regexprep(x, '_', '-'), tasks, 'UniformOutput', 0);
-    if contains(currTask, 'Closed_Loop')
-        [~, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
+    if contains(allTasks{1}, 'Closed_Loop')
+        [fictracData, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     else
-        [~, outputData] = run_trials_MM(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
+        [fictracData, outputData] = run_trials_MM(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     end
 
-    % Save ball data
+    % Save fictrac data
     save([run_obj.expDir '\fictracData_' currTrialCoreName '.mat'], 'fictracData')
         
     % Save metadata
@@ -49,10 +63,13 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     metaData.sid = run_obj.sid;
     metaData.taskFile = run_obj.taskFilePath;
     metaData.outputData = outputData;
-    save([run_obj.expDir '\metadata_' currTrialCoreName '.mat'], 'metaData', 'trial_time');
+    save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData', 'trial_time');
         
+    % Get names and timestamps of all video frames for later comparison to Scanimage timestamps
+    
+    
     % Move video frames from temp directory to appropriate location:
-    savePath = [run_obj.expDir, '\', currTrialCoreName, '\'];
+    savePath = [run_obj.expDir, '\', currBlockCoreName, '\'];
         
     % Create save directory for video frames if it doesn't already exist
     if ~isdir(savePath)

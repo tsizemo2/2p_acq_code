@@ -21,6 +21,7 @@ s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 %       AI.8 = FicTrac X
 %       AI.9 = FicTrac Yaw
 %       AI.10 = FicTrac Y
+%       AI.XX = Camera strobe
 %
 % Output channels:
 %
@@ -71,7 +72,7 @@ for iTrial = 1:nTrials
     latePulseCommand = zeroStim;
     analogStimCommand = stimCommand * 10;
     pulseStimCommand(pairStimStartSample:pairStimEndSample) = 1;
-    latePulseCommand((pairStimStartSample:pairStimEndSample) = 1;
+    latePulseCommand(pairStimStartSample:pairStimEndSample) = 1;
 
     % Create speaker output vector
     speakerStimCommand = zeroStim;
@@ -84,38 +85,39 @@ for iTrial = 1:nTrials
     % Set up camera trigger output
     triggerInterval = round(SAMPLING_RATE / FRAME_RATE);
     cameraTrigger(1:triggerInterval:end) = 1;
-
-    % output_data =         [speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
+    
+    % Set up Scanimage start/next file trigger
+    imagingTrigger = zeroStim;
+    imagingTrigger(1:1000) = 1;
+    imagingTrigger(end) = 0;
+    
+    
+    % output_data =         [imaging trigger    speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           cameraTrigger]
     switch taskType
         case 'OdorA'
-            outputData =    [zeroStim,           stimCommand,        zeroStim,           stimCommand,        cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           stimCommand,        zeroStim,           stimCommand,        cameraTrigger];
         case 'OdorB'
-            outputData =    [zeroStim,           zeroStim,           stimCommand,        stimCommand,        cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           zeroStim,           stimCommand,        stimCommand,        cameraTrigger];
         case 'OdorAPair'
-            outputData =    [zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   cameraTrigger];
         case 'OdorBPair'
-            outputData =    [zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   cameraTrigger];
         case 'OdorABPair'
-            outputData =    [zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   cameraTrigger];
         case 'OdorBAPair'
-            outputData =    [zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   cameraTrigger];
         case {'NoOdor', 'NoStim'}
-            outputData =    [zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
         case 'AirStop'
-            outputData =    [zeroStim,           zeroStim,           zeroStim,           stimCommand,        cameraTrigger];
+            outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           stimCommand,        cameraTrigger];
         case 'Sound'
-            outputData =    [speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
+            outputData =    [imagingTrigger,    speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
         otherwise
             disp('Warning: unrecognized stim type...running trial with no stim.')
             outputData =    [imagingTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           cameraTrigger];
     end
     allOutputData = cat(1, allOutputData, outputData);
 end%iTrial
-
-% Set up scanimage trigger
-imagingTrigger = zeros(size(allOutputData, 1), 1);
-imagingTrigger(2:end-1) = 1;
-allOutputData = [imagingTrigger, allOutputData];
 
 outputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
 queueOutputData(s, outputData);
