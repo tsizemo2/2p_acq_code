@@ -59,7 +59,7 @@ handles.output = hObject;
 % uiwait(handles.figure1);
 
 % Prompt for an experiment directory
-defaultDir = 'C:\Users\wilson_lab\Desktop\Michael\';
+defaultDir = 'C:\Users\Wilson Lab\Desktop\Michael\';
 if ~isdir(defaultDir)
     defaultDir = 'C:\Users\';
 end
@@ -162,7 +162,7 @@ function expDirButton_Callback(hObject, eventdata, handles)                     
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-dname = uigetdir(defaultDir);
+dname = uigetdir('C:\Users\Wilson Lab\Desktop\Michael\');
 handles.expDir = dname;
 
 ghandles = guihandles(hObject);
@@ -177,7 +177,7 @@ function taskFileButton_Callback(hObject, eventdata, handles)                   
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-[FileName,PathName] = uigetfile([defaultDir, '*.txt'],'Select a task file');
+[FileName,PathName] = uigetfile(['C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Task files\', '*.txt'],'Select a task file');
 
 handles.taskFilePath = [PathName '\' FileName];
 

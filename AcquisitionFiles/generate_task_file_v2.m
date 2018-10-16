@@ -50,7 +50,6 @@ for iTask = 1:length(stimTypes)
     if ~isempty(stimOrder)
         
         % Use the task order that was provided
-        
         taskList(stimOrder == iTask) = {fullTaskName};
         taskFileNameStr = [taskFileNameStr, fullTaskName, '_'];
     else
@@ -80,4 +79,5 @@ for iTask = 1:length(taskList)
 end
 fclose(taskFile);
 
+disp(['File saved as ', fullfile(savePath, [taskFileNameStr, '.txt'])])
 end

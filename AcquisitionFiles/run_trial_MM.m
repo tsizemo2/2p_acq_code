@@ -11,7 +11,7 @@ s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 % Add output channel for speaker
 s.addAnalogOutputChannel('Dev1', 2, 'Voltage');
 
-% Add output channels for olfactometer (2-6) and camera trigger (7)
+% Add output channels for olfactometer (1-3) and camera trigger (7)
 chanIDs = {'port0/line1', 'port0/line2', 'port0/line3', 'port0/line7'};
 s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 
@@ -32,10 +32,10 @@ s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 %       P0.3        = olfactometer NO valve ("dummy") 
 %       P0.7        = camera trigger
 
-settings = sensor_settings;
-SAMPLING_RATE = settings.sampRate;
+SAMPLING_RATE = 4000;
 s.Rate = SAMPLING_RATE;
 FRAME_RATE = 25; % This is the behavior camera frame rate
+
 nTrials = run_obj.nTrials;
 trialDuration = run_obj.trialDuration;
 blockDuration = trialDuration * nTrials;
@@ -116,7 +116,6 @@ end%iTrial
 imagingTrigger = zeros(size(allOutputData, 1), 1);
 imagingTrigger(2:end-1) = 1;
 allOutputData = [imagingTrigger, allOutputData];
-
 
 outputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
 queueOutputData(s, outputData);

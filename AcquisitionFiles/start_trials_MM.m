@@ -16,6 +16,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     scanimage_client_skt = '';
     if run_obj.using2P
         scanimage_client_skt = connect_to_scanimage();
+%         fopen(scanimage_client_skt);
         disp('Connected to scanimage server');
     end
 
