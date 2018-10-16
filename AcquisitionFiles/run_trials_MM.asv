@@ -87,13 +87,13 @@ for iTrial = 1:nTrials
     triggerInterval = SAMPLING_RATE / FRAME_RATE;
     framesPerTrial = (trialDuration * SAMPLING_RATE) / triggerInterval;
     if mod(triggerInterval, 1) || mod(framesPerTrial, 1)
-       disp('WARNING: frame count errors due to camera trigger timing are likely!') 
+       disp('WARNING: possible frame count error caused by ') 
     end
     cameraTrigger(1:round(triggerInterval):end) = 1;
     
     % Set up alignment LED output
     alignLEDCommand = zeroStim;
-    alignLEDCommand(1:triggerInterval - 1) = 1;
+    alignLEDCommand
     
     % Set up Scanimage start/next file trigger
     imagingTrigger = zeroStim;

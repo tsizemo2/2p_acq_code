@@ -79,14 +79,17 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     end
         
     % Move frames
-    if isempty(dir(fullfile(tempDir, '*.tif')))
-        disp('Warning: behavior camera not recording!')
-    end
+            disp('Warning: behavior camera not recording!')
     tic
-    cmdStr = ['move "', tempDir, '" "', savePath, '"'];
-    system(cmdStr);
-    disp(['Moving video frames took ', sprintf('%0.2f', toc), ' sec']);
+ 
+        cmdStr = ['move "', tempDir, '" "', savePath, '"'];
+        system(cmdStr);
+        disp(['Moving video frames took ', sprintf('%0.2f', toc), ' sec']);
 
+
+
+    
+    
     % Close scanimage connection
     if run_obj.using2P
         fprintf(scanimage_client_skt, 'END_OF_SESSION');

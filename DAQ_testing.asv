@@ -9,7 +9,7 @@ s = daq.createSession('ni');
 
 % Add output channels
 s.addAnalogOutputChannel('Dev1', 0, 'Voltage');
-s.addDigitalChannel('Dev1', ['port0/line4'], 'OutputOnly');
+% s.addDigitalChannel('Dev3', ['port0/line2:6'], 'OutputOnly');
 
 % Output channels:
 %   Dev3:
@@ -38,7 +38,7 @@ s.Rate = SAMPLING_RATE;
 
 % outputData = [zeroStim, chanACommand, chanBCommand, chanBCommand, chanACommand, dummyCommand];
 % outputData(end, :) = 0; % To make sure the DAQ doesn't stay on between trials
-outputData = [ones(1000,1)*10, ones(1000, 1)];
+outputData = ones(1000,1)*10;
 outputData(end) = 0;
 queueOutputData(s, outputData);
 
