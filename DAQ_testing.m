@@ -21,7 +21,7 @@ s.addDigitalChannel('Dev1', ['port0/line4'], 'OutputOnly');
 %       P0.6        = olfactometer NO valve ("dummy") 
 
 SAMPLING_RATE = 1000;
-s.Rate = SAMPLING_RATE;
+s.Rate = SAMPLING_RATE; 
 % chanSecDur = round(duration * 60 / 2);
 % chanSampDur = round(chanSecDur * SAMPLING_RATE);
 

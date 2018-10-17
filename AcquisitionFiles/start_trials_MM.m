@@ -33,33 +33,36 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     
     % Figure out what the next block number should be
     dirNames = [];
-    dirFiles = dir(run_obj.expDir);
+    dirFiles = dir(fullfile(run_obj.expDir, ['2*sid_', num2str(sid), '*'])); % To exclude '.' and '..' dirs
     for iFile = 1:length(dirFiles)
-        if dirFiles(iFile).isDir
+        if dirFiles(iFile).isdir
             dirNames{end + 1} = dirFiles(iFile).name;
         end
     end
     if ~isempty(dirNames)
-        regExpStr = ['(?<=sid_', num2str(sid), '_bid_).*(?=_tid)'];
+        regExpStr = ['(?<=sid_', num2str(sid), '_bid_).*'];
         blockNums = cellfun(@regexp, dirNames, ...
             repmat({regExpStr}, 1, numel(dirNames)), ...
-            repmat({'match'}, 1, numel(dirNames)));
+            repmat({'match'}, 1, numel(dirNames)), 'uniformoutput', 0);
         currBlock = num2str(max(str2double(blockNums)) + 1);
     else
         currBlock = 0;
     end
     
     % Run trials
-    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_bid_', currBlock];
+    disp(['Starting block #', num2str(currBlock), ' at ', datestr(now)])
+    disp(['Running ', num2str(run_obj.nTrials), ' trials lasting ', num2str(run_obj.trialDuration), ' seconds each'])
+    disp(['Block duration: ', num2str(run_obj.trialDuration * run_obj.nTrials), ' seconds']);
+    currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_bid_', num2str(currBlock)];
     allTasks = cellfun(@(x) regexprep(x, '_', '-'), tasks, 'UniformOutput', 0);
     if contains(allTasks{1}, 'Closed_Loop')
-        [fictracData, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
+        [blockData, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     else
-        [fictracData, outputData] = run_trials_MM(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
+        [blockData, outputData] = run_trials_MM(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     end
 
     % Save fictrac data
-    save([run_obj.expDir '\fictracData_' currTrialCoreName '.mat'], 'fictracData')
+    save([run_obj.expDir '\fictracData_' currBlockCoreName '.mat'], 'blockData')
         
     % Save metadata
     metaData.nTrials = run_obj.nTrials;
@@ -68,7 +71,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     metaData.sid = run_obj.sid;
     metaData.taskFile = run_obj.taskFilePath;
     metaData.outputData = outputData;
-    save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData', 'trial_time');
+    save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData');
     
     % Move video frames from temp directory to appropriate location:
     savePath = [run_obj.expDir, '\', currBlockCoreName, '\'];
@@ -77,16 +80,18 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     if ~isdir(savePath)
         mkdir(savePath)
     end
-        
+    
     % Move frames
-    if isempty(dir(fullfile(tempDir, '*.tif')))
-        disp('Warning: behavior camera not recording!')
+    if isempty(dir(fullfile([tempDir, '.tif'])))
+        disp('WARNING: behavior camera not recording!')
+    else
+        disp('Moving behavior video frames...')
+        tic
+        cmdStr = ['move "', tempDir, '" "', savePath, '"'];
+        system(cmdStr);
+        disp(['Moving video frames took ', sprintf('%0.2f', toc), ' sec']);
     end
-    tic
-    cmdStr = ['move "', tempDir, '" "', savePath, '"'];
-    system(cmdStr);
-    disp(['Moving video frames took ', sprintf('%0.2f', toc), ' sec']);
-
+    
     % Close scanimage connection
     if run_obj.using2P
         fprintf(scanimage_client_skt, 'END_OF_SESSION');

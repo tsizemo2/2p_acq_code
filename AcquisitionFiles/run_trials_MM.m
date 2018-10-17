@@ -1,19 +1,9 @@
-function [ trial_data, outputData ] = run_trials_MM( tasks, run_obj, scanimage_client, trialCoreName )
+function [ block_data, outputData ] = run_trials_MM( tasks, run_obj, scanimage_client, blockCoreName )
 
 global s
 
 % Setup data structures for read / write on the daq board
 s = daq.createSession('ni');
-
-% This channel is lfor external triggering of scanimage 5.1
-s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
-
-% Add output channel for speaker
-s.addAnalogOutputChannel('Dev1', 2, 'Voltage');
-
-% Add output channels for olfactometer (1-3), fiber LED (4) and camera trigger (7)
-chanIDs = {'port0/line1', 'port0/line2', 'port0/line3', 'port0/line4', 'port0/line7'};
-s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 
 % Input channels:
 %
@@ -34,6 +24,20 @@ s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
 %       P0.4        = trial alignment fiber LED
 %       P0.7        = camera trigger
 
+% This channel is lfor external triggering of scanimage 5.1
+s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
+
+% Add output channel for speaker
+s.addAnalogOutputChannel('Dev1', 2, 'Voltage');
+
+% Add output channels for olfactometer (1-3), fiber LED (4) and camera trigger (7)
+chanIDs = {'port0/line1', 'port0/line2', 'port0/line3', 'port0/line4', 'port0/line7'};
+s.addDigitalChannel('Dev1', chanIDs, 'OutputOnly');
+
+% Add analog input channels for FicTrac (4-6) and camera strobe (7) data
+s.addAnalogInputChannel('Dev1', 4:7, 'Voltage');
+
+% Set up params
 SAMPLING_RATE = 4000;
 s.Rate = SAMPLING_RATE;
 FRAME_RATE = 25; % This is the behavior camera frame rate
@@ -94,6 +98,7 @@ for iTrial = 1:nTrials
     % Set up alignment LED output
     alignLEDCommand = zeroStim;
     alignLEDCommand(1:triggerInterval - 1) = 1;
+    alignLEDCommand(end-(triggerInterval - 1):end) = 1;
     
     % Set up Scanimage start/next file trigger
     imagingTrigger = zeroStim;
@@ -128,14 +133,14 @@ for iTrial = 1:nTrials
     allOutputData = cat(1, allOutputData, outputData);
 end%iTrial
 
-outputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
-queueOutputData(s, outputData);
+allOutputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
+queueOutputData(s, allOutputData);
 
 % Trigger scanimage run if using 2p.
 if(run_obj.using2P == 1)
-    scanimage_file_str = ['cdata_' trialCoreName '_tt_', num2str(run_obj.trialDuration), '_'];
-    fprintf(scanimage_client, ['nTrials: ', num2str(nTrials)]);
-    fprintf(scanimage_client, ['trialDuration: ', num2str(trialDuration)]);
+    scanimage_file_str = ['cdata_' blockCoreName '_dur_', num2str(blockDuration), '_nTrials_', num2str(nTrials)];
+%     fprintf(scanimage_client, ['nTrials: ', num2str(nTrials)]);
+%     fprintf(scanimage_client, ['trialDuration: ', num2str(trialDuration)]);
     fprintf(scanimage_client, [scanimage_file_str]);
     disp(['Wrote: ' scanimage_file_str ' to scanimage server' ]);
     acq = fscanf(scanimage_client, '%s');
@@ -145,7 +150,7 @@ end
 % Delay starting the aquisition for 2 seconds to ensure that scanimage is ready
 pause(1.0);
 
-[trial_data, ~] = s.startForeground();
+[block_data, ~] = s.startForeground();
 
 release(s);
 end
