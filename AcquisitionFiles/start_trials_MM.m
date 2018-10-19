@@ -44,7 +44,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
         blockNums = cellfun(@regexp, dirNames, ...
             repmat({regExpStr}, 1, numel(dirNames)), ...
             repmat({'match'}, 1, numel(dirNames)), 'uniformoutput', 0);
-        currBlock = num2str(max(str2double(blockNums)) + 1);
+        currBlock = num2str(max(cellfun(@str2double, blockNums) + 1));
     else
         currBlock = 0;
     end
@@ -53,6 +53,8 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     disp(['Starting block #', num2str(currBlock), ' at ', datestr(now)])
     disp(['Running ', num2str(run_obj.nTrials), ' trials lasting ', num2str(run_obj.trialDuration), ' seconds each'])
     disp(['Block duration: ', num2str(run_obj.trialDuration * run_obj.nTrials), ' seconds']);
+    daysPerSec = 1 * (1/24) * (1/60) * (1/60);
+    disp(['Block end time: ', datestr(now + (run_obj.trialDuration * run_obj.nTrials * daysPerSec))])
     currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_bid_', num2str(currBlock)];
     allTasks = cellfun(@(x) regexprep(x, '_', '-'), tasks, 'UniformOutput', 0);
     if contains(allTasks{1}, 'Closed_Loop')
