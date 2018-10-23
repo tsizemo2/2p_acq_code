@@ -1,4 +1,4 @@
-function [ block_data, outputData ] = run_trials_MM( tasks, run_obj, scanimage_client, blockCoreName )
+function [ block_data, allOutputData ] = run_trials_MM( tasks, run_obj, scanimage_client, blockCoreName )
 
 global s
 
