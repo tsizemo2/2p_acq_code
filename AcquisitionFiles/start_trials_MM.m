@@ -57,8 +57,8 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     disp(['Block end time: ', datestr(now + (run_obj.trialDuration * run_obj.nTrials * daysPerSec))])
     currBlockCoreName = [datestr(now, 'yyyymmdd_HHMMSS'), '_sid_', num2str(sid), '_bid_', num2str(currBlock)];
     allTasks = cellfun(@(x) regexprep(x, '_', '-'), tasks, 'UniformOutput', 0);
-    if contains(allTasks{1}, 'Closed_Loop')
-        [blockData, outputData] = run_trials_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
+    if contains(allTasks{1}, 'Closed-Loop')
+        [blockData, outputData] = run_trial_MM_CL(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     else
         [blockData, outputData] = run_trials_MM(allTasks, run_obj, scanimage_client_skt, currBlockCoreName );
     end

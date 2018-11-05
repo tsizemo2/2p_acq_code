@@ -7,7 +7,7 @@
 
 // GLOBAL PARAMETERS
 const int expThreshold = 700;
-const int spdThresh = 2;  	// Combined movement threshold for stim presentation, in Ain values/sample period
+const int spdThresh = 3;  	// Combined movement threshold for stim presentation, in Ain values/sample period
 const int sampPeriod = 25; 		// Period for analog read sampling rate in msec
 const int jumpTol = 500;    	// Minimum jump size to be considered wrapping (out of 1024 max)
 const int avgWin_1 = 8;     	// Smoothing window size (in samples) for running average of integrated position data

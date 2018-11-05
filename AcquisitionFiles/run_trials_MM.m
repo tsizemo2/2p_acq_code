@@ -139,8 +139,6 @@ queueOutputData(s, allOutputData);
 % Trigger scanimage run if using 2p.
 if(run_obj.using2P == 1)
     scanimage_file_str = ['cdata_' blockCoreName '_dur_', num2str(blockDuration), '_nTrials_', num2str(nTrials)];
-%     fprintf(scanimage_client, ['nTrials: ', num2str(nTrials)]);
-%     fprintf(scanimage_client, ['trialDuration: ', num2str(trialDuration)]);
     fprintf(scanimage_client, [scanimage_file_str]);
     disp(['Wrote: ' scanimage_file_str ' to scanimage server' ]);
     acq = fscanf(scanimage_client, '%s');
