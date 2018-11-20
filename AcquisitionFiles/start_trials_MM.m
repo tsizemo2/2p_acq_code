@@ -23,14 +23,6 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     sid = run_obj.sid;
     run_obj.nTrials = nTasks;
     
-    % Make sure temporary camera save directory doesn't already have images
-    tempDir = 'C:\tmp\*';
-    dirContents = dir(tempDir(1:end-1));
-    if length(dirContents) > 2
-        disp('WARNING: one or more images already exist in temporary video frame save directory')
-    end
-    delete('C:\tmp\*.tif');
-    
     % Figure out what the next block number should be
     dirNames = [];
     dirFiles = dir(fullfile(run_obj.expDir, ['2*sid_', num2str(sid), '*'])); % To exclude '.' and '..' dirs
@@ -74,25 +66,6 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     metaData.taskFile = run_obj.taskFilePath;
     metaData.outputData = outputData;
     save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData');
-    
-    % Move video frames from temp directory to appropriate location:
-    savePath = [run_obj.expDir, '\', currBlockCoreName, '\'];
-        
-    % Create save directory for video frames if it doesn't already exist
-    if ~isdir(savePath)
-        mkdir(savePath)
-    end
-    
-    % Move frames
-    if isempty(dir(fullfile([tempDir, '.tif'])))
-        disp('WARNING: behavior camera not recording!')
-    else
-        disp('Moving behavior video frames...')
-        tic
-        cmdStr = ['move "', tempDir, '" "', savePath, '"'];
-        system(cmdStr);
-        disp(['Moving video frames took ', sprintf('%0.2f', toc), ' sec']);
-    end
     
     % Close scanimage connection
     if run_obj.using2P
