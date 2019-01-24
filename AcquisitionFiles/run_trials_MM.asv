@@ -109,36 +109,36 @@ for iTrial = 1:nTrials
     nextFileTrigger(end) = 0;
     
     
-    % output_data =         [startAcq trigger   nextFile trigger    speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           alignment LED,   cameraTrigger]
+    % output_data =         [startnextFile trigger    speaker,            valve A/shutoff B,  valve B/shutoff A,  NO valve,           alignment LED,   cameraTrigger]
     switch taskType
         case 'OdorA'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           stimCommand,        zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           stimCommand,        zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
         case 'OdorB'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           stimCommand,        stimCommand,        alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           zeroStim,           stimCommand,        stimCommand,        alignLEDCommand, cameraTrigger];
         case 'OdorAPair'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           pulseStimCommand,   zeroStim,           pulseStimCommand,   alignLEDCommand, cameraTrigger];
         case 'OdorBPair'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           zeroStim,           pulseStimCommand,   pulseStimCommand,   alignLEDCommand, cameraTrigger];
         case 'OdorABPair'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   alignLEDCommand, cameraTrigger];
         case 'OdorBAPair'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   alignLEDCommand, cameraTrigger];
         case {'NoOdor', 'NoStim'}
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
         case 'AirStop'
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
         case 'Sound'
-            outputData =    [zeroStim,          nextFileTrigger,    speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
         otherwise
             disp('Warning: unrecognized stim type...running trial with no stim.')
-            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
+            outputData =    [nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
     end
     allOutputData = cat(1, allOutputData, outputData);
 end%iTrial
 
 % Adjust scanimage triggers
-allOutputData(1:1000, 1) = 1;
-allOutputData(1:1000, 2) = 0;
+
+
 
 allOutputData(end, :) = 0; % To make sure the stim doesn't stay on at end of block
 queueOutputData(s, allOutputData);
