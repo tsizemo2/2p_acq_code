@@ -24,7 +24,7 @@ s = daq.createSession('ni');
 %       P0.4        = trial alignment fiber LED
 %       P0.7        = camera trigger
 
-% This channel is lfor external triggering of scanimage 5.1
+% This channel is for external triggering of scanimage 5.1
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
 % Add output channel for speaker
