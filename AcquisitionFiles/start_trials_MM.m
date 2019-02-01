@@ -22,17 +22,12 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
 
     sid = run_obj.sid;
     run_obj.nTrials = nTasks;
-    
+       
     % Figure out what the next block number should be
-    dirNames = [];
-    dirFiles = dir(fullfile(run_obj.expDir, ['2*sid_', num2str(sid), '*'])); % To exclude '.' and '..' dirs
-    for iFile = 1:length(dirFiles)
-        if dirFiles(iFile).isdir
-            dirNames{end + 1} = dirFiles(iFile).name;
-        end
-    end
+    dirFiles = dir(fullfile(run_obj.expDir, ['metadata*sid_', num2str(sid), '*']));
+    dirNames = {dirFiles.name};
     if ~isempty(dirNames)
-        regExpStr = ['(?<=sid_', num2str(sid), '_bid_).*'];
+        regExpStr = ['(?<=sid_', num2str(sid), '_bid_).*(?=\.mat)'];
         blockNums = cellfun(@regexp, dirNames, ...
             repmat({regExpStr}, 1, numel(dirNames)), ...
             repmat({'match'}, 1, numel(dirNames)), 'uniformoutput', 0);
@@ -66,7 +61,7 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     metaData.taskFile = run_obj.taskFilePath;
     metaData.outputData = outputData;
     save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData');
-    
+         
     % Close scanimage connection
     if run_obj.using2P
         fprintf(scanimage_client_skt, 'END_OF_SESSION');
