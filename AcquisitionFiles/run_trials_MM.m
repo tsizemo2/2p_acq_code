@@ -73,6 +73,11 @@ for iTrial = 1:nTrials
     stimEndSample = round(stimEndTime * SAMPLING_RATE);
     pairStimStartSample = round(pairStimStartTime * SAMPLING_RATE);
     pairStimEndSample = round(pairStimEndTime * SAMPLING_RATE);
+    
+    omitStimCommand = repmat([zeros(SAMPLING_RATE, 1); ones(SAMPLING_RATE, 1)], ...
+            ceil(trialDuration / 2), 1);
+    omitStimCommand = omitStimCommand(1:numel(zeroStim)); % in case trialDuration is odd
+    omitStimCommand(stimStartSample:stimEndSample) = 0;
 
     % Create stim output vectors
     stimCommand(stimStartSample:stimEndSample) = 1;
@@ -81,7 +86,7 @@ for iTrial = 1:nTrials
     analogStimCommand = stimCommand * 10;
     pulseStimCommand(pairStimStartSample:pairStimEndSample) = 1;
     latePulseCommand(pairStimStartSample:pairStimEndSample) = 1;
-
+    
     % Create speaker output vector
     speakerStimCommand = zeroStim;
     f = 200;
@@ -123,6 +128,8 @@ for iTrial = 1:nTrials
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           stimCommand,        latePulseCommand,   pulseStimCommand,   alignLEDCommand, cameraTrigger];
         case 'OdorBAPair'
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           latePulseCommand,   stimCommand,        pulseStimCommand,   alignLEDCommand, cameraTrigger];
+        case 'OdorAOmit'
+            outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           omitStimCommand,    zeroStim,           omitStimCommand,    alignLEDCommand, cameraTrigger];
         case {'NoOdor', 'NoStim'}
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
         case 'AirStop'
