@@ -21,7 +21,7 @@ function generate_task_file_v2(stimTypes, stimTimes, stimDurs, varargin)
 %                      generate a pop-up window to select a directory.
 %
 %       stimOrder   = a numeric vector specifying an order to use instead of randomizing. The numbers
-%                     should refer to the order that the stimTypes are listed in.
+%                     should refer to the order that the stimTypes are listed in (replaces 'reps').
 %
 %       nameStr     = if providing a stimOrder, a string to add onto the task file name for ID purposes.
 %

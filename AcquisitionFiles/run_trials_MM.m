@@ -74,8 +74,8 @@ for iTrial = 1:nTrials
     pairStimStartSample = round(pairStimStartTime * SAMPLING_RATE);
     pairStimEndSample = round(pairStimEndTime * SAMPLING_RATE);
     
-    omitStimCommand = repmat([zeros(SAMPLING_RATE, 1); ones(SAMPLING_RATE, 1)], ...
-            ceil(trialDuration / 2), 1);
+    omitStimCommand = repmat([zeros(SAMPLING_RATE * stimDur, 1); ones(SAMPLING_RATE * stimDur, 1)], ...
+            ceil(trialDuration / (2 * stimDur)), 1);
     omitStimCommand = omitStimCommand(1:numel(zeroStim)); % in case trialDuration is odd
     omitStimCommand(stimStartSample:stimEndSample) = 0;
 
