@@ -1,0 +1,19 @@
+
+# INPUT PARAMETERS:
+# %1% = expDate
+# %2% = parentDir
+
+# OPEN CONNECTION
+open sftp://mjm60:Bub21kiss%21@transfer.rc.hms.harvard.edu/ -hostkey="ssh-rsa 2048 8yw8x5M4WqNYuVY3FMltn3Hu3rc19VN6pvBpWn2dsrw="
+
+
+# CREATE DIRECTORIES
+mkdir "/n/scratch2/mjm60/%1%"
+mkdir "/n/scratch2/mjm60/%1%/BehaviorVideo"
+mkdir "/n/scratch2/mjm60/%1%/ImagingData"
+
+# TRANSFER FILES
+lcd "%2%"
+put * "/n/scratch2/mjm60/%1%/BehaviorVideo/"
+
+exit

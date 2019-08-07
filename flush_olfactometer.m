@@ -10,17 +10,15 @@ global s
 s = daq.createSession('ni');
 
 % Add output channels
-s.addAnalogOutputChannel('Dev3', 0, 'Voltage');
-s.addDigitalChannel('Dev3', ['port0/line2:6'], 'OutputOnly');
+s.addAnalogOutputChannel('Dev1', 0, 'Voltage');
+s.addDigitalChannel('Dev1', ['port0/line1:3'], 'OutputOnly');
 
 % Output channels:
 %   Dev3:
 %       AO.1        = dummy channel just to use clock
-%       P0.2        = olfactometer valve A
-%       P0.3        = olfactometer valve B
-%       P0.4        = olfactometer channel A shutoff valve
-%       P0.5        = olfactometer channel B shutoff valve
-%       P0.6        = olfactometer NO valve ("dummy") 
+%       P0.1        = olfactometer valve A/shutoff B
+%       P0.2        = olfactometer valve B/shutoff A
+%       P0.3        = olfactometer NO valve ("dummy") 
 
 SAMPLING_RATE = 1000;
 s.Rate = SAMPLING_RATE;
@@ -38,7 +36,7 @@ chanACommand(1:chanSampDur) = 1;
 chanBCommand(chanSampDur:end) = 1;
 dummyCommand(:) = 1;
 
-outputData = [zeroStim, chanACommand, chanBCommand, chanBCommand, chanACommand, dummyCommand];
+outputData = [zeroStim, chanACommand, chanBCommand, dummyCommand];
 outputData(end, :) = 0; % To make sure the DAQ doesn't stay on between trials
 queueOutputData(s, outputData);
 
