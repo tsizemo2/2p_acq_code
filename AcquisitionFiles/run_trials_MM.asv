@@ -109,13 +109,17 @@ for iTrial = 1:nTrials
         optoStimEndSample = stimEndSample;
     end
     optoStim = zeroStim;
+   
+    optoStim = (1:40000) * 0;
     PWM_PERIOD = 40;    % 400 = 100 Hz, 40 = 1kHz
-    PWM_DC = 20;        % 2-98 @ 100 Hz, 20-80 @ 1kHz
+    PWM_DC = 50;        % 20- @ 100 Hz, 25-75 @ 1kHz
     pwmInterval = round(PWM_PERIOD * (PWM_DC/100));
     
     for i = 1:pwmInterval
        optoStim(optoStimStartSample + i:PWM_PERIOD:optoStimEndSample) = 1; 
     end
+    
+    figure(1);clf;imagesc(optoStim)
        
     % Set up camera trigger output
     triggerInterval = SAMPLING_RATE / FRAME_RATE;
