@@ -8,12 +8,15 @@ open sftp://mjm60:Bub21kiss%21@transfer.rc.hms.harvard.edu/ -hostkey="ssh-rsa 20
 
 
 # CREATE DIRECTORIES
+option batch continue
+option confirm off
 mkdir "/n/scratch2/mjm60/%1%"
 mkdir "/n/scratch2/mjm60/%1%/BehaviorVideo"
-mkdir "/n/scratch2/mjm60/%1%/ImagingData"
+option batch abort
 
 # TRANSFER FILES
 lcd "%2%"
+echo test
 put * "/n/scratch2/mjm60/%1%/BehaviorVideo/"
 
 exit

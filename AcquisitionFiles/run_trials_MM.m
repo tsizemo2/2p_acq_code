@@ -6,7 +6,7 @@ global s
 s = daq.createSession('ni');
 
 % Input channels:
-%
+%se
 %   Dev1:
 %       AI.4 = FicTrac X
 %       AI.5 = FicTrac Yaw
@@ -100,11 +100,11 @@ for iTrial = 1:nTrials
     sineTone = sin(2*pi*f*t) * 10;
     speakerStimCommand(stimStartSample:stimEndSample) = sineTone;
     
-    % Create opto stim command output vector (using 10% PWM to increase dynamic range)
+    % Create opto stim command output vector 
     optoStim = stimCommand;
 %     optoStim = zeroStim;
 %     for i = 1:10
-%        optoStim(stimStartSample + i:100:stimEndSample) = 1; 
+%        optoStim(stimStartSample + i:100:stimEndSample) = 1; %(using PWM to increase dynamic range)
 %     end
 %     optoStim(stimStartSample:10:stimEndSample) = 1;
 %     
@@ -149,7 +149,9 @@ for iTrial = 1:nTrials
         case 'Sound'
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,       speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
         case 'OptoStim'
-            outputData =    [zeroStim,          nextFileTrigger,    optoStim,       zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger]; 
+            outputData =    [zeroStim,          nextFileTrigger,    optoStim,       zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
+        case 'OdorA+Opto'
+            outputData =    [zeroStim,          nextFileTrigger,    optoStim,       zeroStim,           stimCommand,        zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
         otherwise
             disp('Warning: unrecognized stim type...running trial with no stim.')
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,       zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
