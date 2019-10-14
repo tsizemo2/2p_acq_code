@@ -51,7 +51,8 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     end
 
     % Save fictrac data
-    save([run_obj.expDir '\fictracData_' currBlockCoreName '.mat'], 'blockData')
+    blockData = blockData(1:100:end, :); % downsample to reduce file size
+    save([run_obj.expDir '\fictracData_' currBlockCoreName '.mat'], 'blockData', '-v7.3')
         
     % Save metadata
     metaData.nTrials = run_obj.nTrials;
@@ -59,8 +60,8 @@ if(strcmp(STIM_TYPE, 'Task File') == 1)
     metaData.stimTypes = tasks;
     metaData.sid = run_obj.sid;
     metaData.taskFile = run_obj.taskFilePath;
-    metaData.outputData = outputData;
-    save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData');
+    metaData.outputData = outputData(1:100:end, :);
+    save([run_obj.expDir '\metadata_' currBlockCoreName '.mat'], 'metaData', '-v7.3');
          
     % Close scanimage connection
     if run_obj.using2P

@@ -55,6 +55,7 @@ blockDuration = trialDuration * nTrials;
 
 allOutputData = [];
 for iTrial = 1:nTrials
+    disp(iTrial)
     
     % Parse task name
     currTask = tasks{iTrial};
@@ -112,7 +113,6 @@ for iTrial = 1:nTrials
     PWM_PERIOD = 40;    % 400 = 100 Hz, 40 = 1kHz
     PWM_DC = 20;        % 2-98 @ 100 Hz, 20-80 @ 1kHz
     pwmInterval = round(PWM_PERIOD * (PWM_DC/100));
-    
     for i = 1:pwmInterval
        optoStim(optoStimStartSample + i:PWM_PERIOD:optoStimEndSample) = 1; 
     end
@@ -157,7 +157,7 @@ for iTrial = 1:nTrials
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,       zeroStim,           zeroStim,           zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
         case 'Sound'
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,       speakerStimCommand, zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
-        case 'OptoStim'
+        case {'OptoStim', 'LEDstim'}
             outputData =    [zeroStim,          nextFileTrigger,    optoStim,       zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
         case {'OdorA+Opto', 'OdorA+LEDbackground'}
             outputData =    [zeroStim,          nextFileTrigger,    optoStim,       zeroStim,           stimCommand,        zeroStim,           stimCommand,        alignLEDCommand, cameraTrigger];
@@ -165,7 +165,12 @@ for iTrial = 1:nTrials
             disp('Warning: unrecognized stim type...running trial with no stim.')
             outputData =    [zeroStim,          nextFileTrigger,    zeroStim,       zeroStim,           zeroStim,           zeroStim,           zeroStim,           alignLEDCommand, cameraTrigger];
     end
-    allOutputData = cat(1, allOutputData, outputData);
+    if iTrial == 1
+        samplesPerTrial = numel(zeroStim);
+        allOutputData = zeros(samplesPerTrial * nTrials, size(outputData, 2));
+    end
+    nextInd = ((iTrial - 1) * samplesPerTrial) + 1;
+    allOutputData(nextInd:nextInd + samplesPerTrial - 1, :) = outputData;
 end%iTrial
 
 % Adjust scanimage triggers
