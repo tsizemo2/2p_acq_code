@@ -125,3 +125,27 @@ func = positionArray;
  str_x = [directory_name '\position_function_003_static']; 
  save(str_x, 'func'); % variable must be named 'func'
  
+ %% Test pattern
+TEST_DUR = 10 % Duration of test pattern in seconds
+PANELS_FRAME_RATE = 200; %Hz
+POSITION_FUNCTION_LENGTH = PANELS_FRAME_RATE * TEST_DUR; % this how many frames long these normally are... set by panels
+numOfPanelsAcross = 12;% 
+numOfPanelsVertically = 2;%
+LEDdotsPerPanel = 8; % this shouldn't change!  LEDs are always 8 dots in x and y. 
+LEDdotsAcross = numOfPanelsAcross * LEDdotsPerPanel; % 
+
+positionsPerSec = floor(LEDdotsAcross / TEST_DUR);
+positionArray = [];
+for iSec = 1:TEST_DUR
+    startPos = 1 + ((iSec - 1) * (PANELS_FRAME_RATE));
+    endPos = startPos + PANELS_FRAME_RATE - 1;
+    positionArray(startPos:endPos) = iSec * positionsPerSec;
+end
+
+func = positionArray;
+%% SAVE position function place to be put on the SD card:
+% place to save patterns to be put on the SD card:
+ directory_name = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\Panels_patterns_and_functions\functions';
+ str_x = [directory_name '\position_function_004_testPattern']; 
+ save(str_x, 'func'); % variable must be named 'func'
+ 
