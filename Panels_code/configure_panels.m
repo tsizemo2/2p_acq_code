@@ -94,13 +94,13 @@ else
 end
 
 % Set display update frequency
-Panel_com('set_funcy_freq', displayFreq);
+Panel_com('set_funcy_freq', displayRate);
 pause(0.03);
-Panel_com('set_funcx_req', displayFreq);
+Panel_com('set_funcx_freq', displayRate);
 pause(0.03);
 
 % Enable external trigger
-Panel_com('enable_extern_trig');
+%  Panel_com('enable_extern_trig');
+Panel_com('start');
 pause(0.03);
-
 end

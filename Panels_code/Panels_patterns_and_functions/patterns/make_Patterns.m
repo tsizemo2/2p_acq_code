@@ -15,7 +15,7 @@ LEDdotsAcross = numOfPanelsAcross * LEDdotsPerPanel; % 56 for yvette's set up
 LEDdotsVertically = numOfPanelsVertically * LEDdotsPerPanel;% 16 for yvette's current set up
 
 missingPanelXPos = (10*LEDdotsPerPanel + 1):(10*LEDdotsPerPanel + LEDdotsPerPanel); % LED positions of the panel that is removed for the FicTrac camera to look through
-missingPanelYPos = (LEDdotsVertically/2 + 1):LEDdotsVertically;
+missingPanelYPos =  1:(LEDdotsVertically/2); % (LEDdotsVertically/2 + 1):LEDdotsVertically;
 
 %Save general infomation about pattern layout
 pattern.x_num = LEDdotsAcross; % this variable will where the dot is on the screen in x, last dim = 56 is blank
@@ -71,6 +71,6 @@ pattern.data = Make_pattern_vector(pattern);
  
  %% SAVE pattern place to save patterns to be put on the SD card:
 % place to save patterns to be put on the SD card:
- directory_name = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_patterns_and_functions\patterns';
+ directory_name = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\Panels_patterns_and_functions\patterns';
  str = [directory_name '\Pattern_001_2pixelBrightVertBar']; 	% name must begin with ‘Pattern_’
  save(str, 'pattern');
