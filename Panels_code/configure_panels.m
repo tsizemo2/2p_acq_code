@@ -104,7 +104,7 @@ pause(0.03);
 % Enable external trigger
 %  Panel_com('enable_extern_trig');
 Panel_com('start');
-pause(0.03);
+% pause(0.03);
 
 panelsReady = 1;
 
