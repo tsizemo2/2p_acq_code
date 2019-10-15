@@ -12,7 +12,7 @@ MISSING_PANEL_X_INDS = 81:88;   % Missing panel is the 11th horizontally (indexe
 MISSING_PANEL_Y_INDS = 1:8;     % Missing panel is in the top row (indexed from top to bottom)
 
 PANEL_ADDRESS_MAP = [23, 19, 15, 22, 18, 14, 21, 17, 13, 24, 20, 16; ...
-                     11, 7, 3, 10, 6, 2, 9, 5, 1, 12, 8, 4];
+                    11, 7, 3, 10, 6, 2, 9, 5, 1, 12, 8, 4];
 
 %% LIGHT ON dots 2 LED wide vertical bar
 % The bar's horizontal location is encoded in x dim 
