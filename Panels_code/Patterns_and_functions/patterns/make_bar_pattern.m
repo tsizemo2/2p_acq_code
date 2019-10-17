@@ -19,9 +19,9 @@ load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
     % PANEL_ADDRESS_MAP = [23, 19, 15, 22, 18, 14, 21, 17, 13, 24, 20, 16; ...
 %                          11, 7, 3, 10, 6, 2, 9, 5, 1, 12, 8, 4];
 
-%% CREATE BAR PATTERN
+%% CREATE MOVING BAR PATTERN
 
-patternName = 'bright_bar_height-16_width-2_brightness-33_Xdim-barPos_Ydim-barOnOff';
+patternName = 'bright_bar_height-16_width-2_brightness-33_Xdim-barPosCW_Ydim-barOnOff';
 patternNum = 1;
 
 barWidth = 2;               % bar width in LEDs
@@ -33,6 +33,7 @@ gsVal = 2;       % Specifies grey scale range mapping of the values in Pats:
                     %   4: 0-15
 barBrightness = 1;          % Maps onto to the selected gsVal range
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
+barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 % Add general info to pattern structure
 pattern = [];
@@ -51,7 +52,13 @@ barPattern(barYpos, 1:barWidth) = barBrightness;
 
 % Fill pattern array by shifting bar pattern clockwise by one LED as X index increases
 for xPos = 1:HORZ_LED_COUNT
-    Pats(:, :, xPos, 1) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
+    if strcmpi(barMotionDirection, 'cw')
+        Pats(:, :, xPos, 1) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
+    elseif strcmpi(barMotionDirection, 'ccw')
+        Pats(:, :, xPos, 1) = ShiftMatrix(barPattern, xPos - 1, 'l', 'y');
+    else
+        error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
+    end
 end
 
 %---------------------------------------------------------------------------------------------------
@@ -84,6 +91,7 @@ pattern.userData.patternName = patternName;
 pattern.userData.barWidth = barWidth;
 pattern.userData.barYpos = barYpos;
 pattern.userData.barBrightness = barBrightness;
+pattern.userData.barMotionDirection = barMotionDirection;
 pattern.userData.backgroundBrightness = backgroundBrightness;
 pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;
 pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
@@ -96,7 +104,7 @@ fileName = [fileNamePrefix, '_', patternName, '.mat'];
 % Warn user if a pattern with this number already exists in the save directory
 myFiles = dir(fullfile(saveDir, [fileNamePrefix, '*']));
 if ~isempty(myFiles)
-    dlgAns = errordlg(['There is already a pattern file with that number in this directory! ', ...
+    errordlg(['There is already a pattern file with that number in this directory! ', ...
             'Please change the pattern number or delete the original file before saving.'], ...
             'Pattern Number Error');
 else

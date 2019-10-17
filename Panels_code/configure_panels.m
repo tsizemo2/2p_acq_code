@@ -35,7 +35,7 @@ panelsReady = 0;
 % Parse optional arguments
 p = inputParser;
 addParameter(p, 'DisplayRate', 200);
-addParameter(p, 'InitialPos', [1 1]);
+addParameter(p, 'InitialPos', [1 1]); 
 addParameter(p, 'PanelMode', 'OpenLoop');
 addParameter(p, 'ClosedLoopDim', 'x');
 addParameter(p, 'PosFunNumX', 1);
