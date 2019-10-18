@@ -1,4 +1,4 @@
-function start_panels_trial(trialSettings)
+function setup_panels_trial(trialSettings)
 %===================================================================================================
 % Called from the panels_exp_GUI to start running a trial. A separate function (run_panels_trial) 
 % will actually create and run the session object, then return all the recorded and output data.
@@ -116,7 +116,7 @@ end
 mD.SAMPLING_RATE = 10000;
 
 % Run trial
-[trialData, outputData, columnLabels] = run_panels_exp(mD, scanimageClientSkt);
+[trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
 
 % Turn off panels if necessary
 if tS.usingPanels
