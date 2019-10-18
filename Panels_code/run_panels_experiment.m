@@ -98,7 +98,8 @@ columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand'};
 % Get scanimage ready if using 2P
 if tS.using2P
    % Sending string containing file naming and trial duration info for scanimage to use
-   siFileStr =  [mD.expID, '_', tS.expName, '_', mD.trialNum, '_', tS.trialDuration];
+   siFileStr =  [mD.expID, '_', tS.expName, '_trial_', num2str(mD.trialNum), '_dur_', ...
+            num2str(tS.trialDuration)];
    fprintf(scanimageClient, siFileStr);
    disp(['Wrote: ', siFileStr, ' to scanimage server']);
    pause(2)
