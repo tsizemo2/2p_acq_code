@@ -1,4 +1,4 @@
-function panelsReady = configure_panels(patternNum, varargin)
+function configure_panels(patternNum, varargin)
 %===================================================================================================
 % This function sets up the panels for use in an open- or closed-loop experiment. After running this
 % function the panels will be primed and ready to be started by a TTL trigger.
@@ -29,8 +29,6 @@ function panelsReady = configure_panels(patternNum, varargin)
 %                         use for controlling the pattern in the Y dimension.
 %
 %===================================================================================================
-
-panelsReady = 0;
 
 % Parse optional arguments
 p = inputParser;
@@ -103,9 +101,7 @@ pause(0.03);
 
 % Enable external trigger
 %  Panel_com('enable_extern_trig');
-Panel_com('start');
+% Panel_com('start');
 % pause(0.03);
-
-panelsReady = 1;
 
 end
