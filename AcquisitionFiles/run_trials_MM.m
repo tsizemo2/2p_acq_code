@@ -6,7 +6,6 @@ global s
 s = daq.createSession('ni');
 
 % Input channels:
-%se
 %   Dev1:
 %       AI.4 = FicTrac X
 %       AI.5 = FicTrac Yaw

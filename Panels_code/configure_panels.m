@@ -86,7 +86,7 @@ elseif strcmp(panelMode, 'ClosedLoop')
     end
     pause(0.03);
     % Make sure the dimension that's not under closed-loop control just stays in its intial 
-    % position (setting the rate of cycling through pattern frames to zero in mode #0)
+    % position (by setting the rate of cycling through pattern frames to zero in mode #0)
     Panel_com('send_gain_bias', [0 0 0 0]);
     pause(0.03);
 else
