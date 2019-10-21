@@ -108,6 +108,22 @@ if tS.usingPanels
             'PanelMode', tS.panelMode, 'PosFunNumX', ts.xDimPosFun, 'PosFunNumY', ts.yDimPosFun);
 end
 
+
+
+%%%
+% Could also have it start running FicTrac here if I'm running it live and 
+% saving the output video. This would allow me to save the video for each
+% trial in a specific location/directory. I figured out that I can do this 
+% using system commands as in the following:
+%
+% cmdStr = 'cd "C:\Users\Wilson Lab\Documents\FicTrac_MM\data" & ..\bin\Release\fictrac.exe ..\config\config.txt &'
+% [status, cmdout] = system(cmdStr);
+%
+% And then after the trial is finished I can kill it automatically using:
+% system('taskkill /F /im fictrac.exe');
+%
+%%%
+
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
 cmdStr = ['cd "', ts.saveDir, '" & ', FT_PATH, ' config.txt &'];
@@ -142,9 +158,6 @@ saveFileSuffix = ['_', datestr(now, 'HHMMSS'), '_trial_', ...
 save([saveFilePrefix, 'metadata', saveFileSuffix], mD, '-v7.3');
 save([saveFilePrefix, 'daqData', saveFileSuffix], trialData, outputData, columnLabels, '-v7.3');
 
-
-%%% ---------- PROCESS FICTRAC OUTPUT FILES ---------- %%%
-
 % Rename the FicTrac output files that were created during this trial and then move them to a 
 % dedicated subdirectory. There should be three output files from each trial: one .dat with the log, 
 % one .txt with the data, and one .avi with the raw video.
@@ -168,15 +181,27 @@ else
         mkdir(ftDataDir);
     end
     
-    % Append trial number onto the end of the data file names and move them to FicTracData folder
+    % Append trial number onto the end of the data files
     dataFileNames = {ftLogFiles.name, ftDataFiles.name, ftVidFiles.name};
     trialStr = pad(num2str(mD.trialNum), 3, 'left', '0');
     for iFile = 1:numel(dataFileNames)
-       sourceName = fullfile(tS.saveDir, dataFileNames{iFile}); 
-       destName = fullfile(ftDataDir, regexprep(dataFileNames{iFile}, '.', ['_', trialStr, '.']));
-       movefile(sourceName, destName);
-       disp(['Moved ', sourceName, ' to ', destName]);
-    end    
+       destName = fullfile(tS.save
+        
+    end
+    
+    movefile(fullfile(ts.saveDir, ftLogFiles(1).name)
+    
+    
+    % Move the files in to the FicTracData folder
+    
+    
 end
+
+
+
+
+
+
+
 
 end

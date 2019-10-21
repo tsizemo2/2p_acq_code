@@ -101,27 +101,12 @@ if tS.using2P
             num2str(tS.trialDuration)];
    fprintf(scanimageClient, siFileStr);
    disp(['Wrote: ', siFileStr, ' to scanimage server']);
-   pause(2)
+   pause(1)
    siClientResponse = fscanf(scanimageClient, '%s');
    disp('Read: ', siClientResponse, ' from scanimage server');
 end
 
-%%%
-% Could also have it start running FicTrac here if I'm running it live and 
-% saving the output video. This would allow me to save the video for each
-% trial in a specific location/directory. I figured out that I can do this 
-% using system commands as in the following:
-%
-% cmdStr = 'cd "C:\Users\Wilson Lab\Documents\FicTrac_MM\data" & ..\bin\Release\fictrac.exe ..\config\config.txt &'
-% [status, cmdout] = system(cmdStr);
-%
-% And then after the trial is finished I can kill it automatically using:
-% system('taskkill /F /im fictrac.exe');
-%
-%%%
-
-
-% Wait for another couple of seconds to make sure scanimage is ready
+% Wait for another couple of seconds to make sure scanimage is really ready
 pause(2)
 
 
