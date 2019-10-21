@@ -5,7 +5,7 @@ saveDir = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\Patterns_
 
 %% LOAD CONSTANT PARAMETERS
 
-paramFilePath = 'C:\Users\Wilson Lab\Documents\MATLAB\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
+paramFilePath = 'C:\Users\Wilson Lab\Desktop\Michael\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
 load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
 
 % Contains hardcoded variables (example values from MM's setup):

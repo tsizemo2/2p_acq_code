@@ -4,7 +4,7 @@ saveDir = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\Patterns_
 
 %% LOAD CONSTANT PARAMETERS
 
-paramFilePath = 'C:\Users\Wilson Lab\Documents\MATLAB\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
+paramFilePath = 'C:\Users\Wilson Lab\Desktop\Michael\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
 load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
 
 % Contains hardcoded variables (example values from MM's setup):
@@ -26,14 +26,14 @@ functionNum = 1;
 
 displayRate = 200;
 positionsPerCycle = HORZ_LED_COUNT;
-cycleTime = 19.2; % this is the desired time to complete one cycle through the target dimension at 
+cycleTime = 20; % this is the desired time to complete one cycle through the target dimension at 
 % displayRate. NOTE: actual cycle time will be slightly different to ensure that the same integer 
 % number of frames is spent at each position.
 
-% ------------------------------------
-
 targetFramesPerCycle = displayRate * cycleTime;
 framesPerPosition = round(targetFramesPerCycle / positionsPerCycle);
+% ------------------------------------
+
 actualCycleTime = (framesPerPosition * positionsPerCycle) / displayRate;
 actualFramesPerCycle = displayRate * actualCycleTime;
 
@@ -45,16 +45,22 @@ end
 
 func = positionArray; % Needs to be named this for panels code to read it
 
-%% SAVE POSITION FUNC
-
-fileName = ['position_function_', pad(num2str(functionNum), 3, 'left', '0'), functionName, '.mat'];
 
 
 
+%% SAVE POSITION FUNCTION
 
+fileNamePrefix = ['position_function_', pad(num2str(functionNum), 3, 'left', '0')];
+fileName = [fileNamePrefix, '_', functionName, '.mat'];
 
-
-
-
-
-
+% Warn user if a position function with this number already exists in the save directory
+myFiles = dir(fullfile(saveDir, [fileNamePrefix, '*']));
+if ~isempty(myFiles)
+    errordlg(['There is already a position function file with that number in this directory! ', ...
+            'Please change the number or delete the original file before saving.'], ...
+            'Error');
+else
+    % Save file
+    save(fullfile(saveDir, fileName), 'func');
+end 
+ 

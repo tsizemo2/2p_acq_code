@@ -4,7 +4,7 @@ saveDir = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\Patterns_
 
 %% LOAD CONSTANT PARAMETERS
 
-paramFilePath = 'C:\Users\Wilson Lab\Documents\MATLAB\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
+paramFilePath = 'C:\Users\Wilson Lab\Desktop\Michael\2P_acq_code\Panels_code\Patterns_and_functions\arena_config';
 load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
 
 % Contains hardcoded variables (example values from MM's setup):
@@ -31,7 +31,7 @@ cycleTime = 20; % this is the desired time to complete one cycle through the tar
 % number of frames is spent at each position.
 
 targetFramesPerCycle = displayRate * cycleTime;
-framesPerPosition = round(targetFramesPerCycle / positionsPerCycle)
+framesPerPosition = round(targetFramesPerCycle / positionsPerCycle);
 % ------------------------------------
 
 actualCycleTime = (framesPerPosition * positionsPerCycle) / displayRate;
@@ -44,6 +44,18 @@ for iFrame = 1:actualFramesPerCycle
 end
 
 func = positionArray; % Needs to be named this for panels code to read it
+
+%% STATIC
+% Stays at the initial position without moving
+
+functionName = 'static_framesPerCycle-1000';
+functionNum = 2;
+
+framesPerCycle = 1000;
+
+positionArray = zeros(1, framesPerCycle);
+
+func = positionArray;
 
 %% SAVE POSITION FUNCTION
 
