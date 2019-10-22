@@ -59,7 +59,7 @@ mD = []; mD.trialSettings = tS; % Variable for recording metadata about the tria
 
 % Check whether there is an existing directory with the same date and exp num
 mD.expID = [datestr(now, 'yyyymmdd'), '-', num2str(tS.expNum)];
-expIDDir = dir(fullfile(ts.saveDir, [mD.expID, '*']));
+expIDDir = dir(fullfile(tS.saveDir, [mD.expID, '*']));
 
 % If yes, make sure it also has the same experiment name and abort trial if it doesn't. 
 % If no, create a new directory for the experiment.
@@ -68,15 +68,16 @@ if ~isempty(expIDDir) && ~strcmp(expIDDir(1).name, expDirName)
     errordlg('Error: an experiment with the same date and number but a different name', ...
                 ' already exists in the save directory...aborting trial.', 'Error')
     return
-elseif ~isfolder(expDirName)
+elseif ~isdir(fullfile(tS.saveDir, expDirName))
     % Create the experiment directory if it does not already exist
     mkdir(fullfile(tS.saveDir, expDirName));
     disp('Creating new experiment directory...')
 end
 mD.expDirName = expDirName;
+mD.expDir = fullfile(tS.saveDir, expDirName);
 
 % Determine next trial number by looking at previously saved metadata files
-mdFiles = dir(fullfile(ts.SaveDir, expDirName, 'metadata*.mat'));
+mdFiles = dir(fullfile(tS.saveDir, expDirName, 'metadata*.mat'));
 fileNames = {mdFiles.name};
 if ~isempty(fileNames)
     regexStr = '(?<=trial_).*(?=\.mat)';
@@ -105,12 +106,13 @@ end
 if tS.usingPanels
     disp('Configuring panels...')
     configure_panels(tS.patternNum, 'DisplayRate', tS.displayRate, 'InitialPos', tS.initialPos, ...
-            'PanelMode', tS.panelMode, 'PosFunNumX', ts.xDimPosFun, 'PosFunNumY', ts.yDimPosFun);
+            'PanelMode', tS.panelMode, 'PosFunNumX', tS.xDimPosFun, 'PosFunNumY', tS.yDimPosFun);
 end
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
-cmdStr = ['cd "', ts.saveDir, '" & ', FT_PATH, ' config.txt &'];
+cmdStr = ['cd "', mD.expDir, '" & "', FT_PATH, ...
+        '" config.txt &'];
 system(cmdStr);
 
 % Add some hardcoded session params
@@ -136,11 +138,13 @@ if tS.using2P
 end
 
 % Save data, adding a precise timestamp in the middle of the file names for reference
-saveFilePrefix = fullfile(tS.saveDir, [mD.expID, '_']);
+saveFilePrefix = fullfile(mD.expDir, [mD.expID, '_']);
 saveFileSuffix = ['_', datestr(now, 'HHMMSS'), '_trial_', ...
         pad(num2str(mD.trialNum), 3, 'left', '0'), '.mat']; 
-save([saveFilePrefix, 'metadata', saveFileSuffix], mD, '-v7.3');
-save([saveFilePrefix, 'daqData', saveFileSuffix], trialData, outputData, columnLabels, '-v7.3');
+disp(saveFilePrefix)
+disp(saveFileSuffix)
+save([saveFilePrefix, 'metadata', saveFileSuffix], 'mD', '-v7.3');
+save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'columnLabels', '-v7.3');
 
 
 %%% ---------- PROCESS FICTRAC OUTPUT FILES ---------- %%%
@@ -150,21 +154,21 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], trialData, outputData, columnL
 % one .txt with the data, and one .avi with the raw video.
 
 % Identify the new output files in the main experiment directory
-ftLogFiles = dir(fullfile(tS.saveDir, 'fictrac*.dat'));
-ftDataFiles = dir(fullfile(tS.saveDir, 'fictrac*.txt'));
-ftVidFiles = dir(fullfile(tS.saveDir, 'fictrac*.avi'));
+ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));
+ftDataFiles = dir(fullfile(mD.expDir, 'fictrac*.log'));
+ftVidFiles = dir(fullfile(mD.expDir, 'fictrac*.avi'));
 
 % If there is not exactly one of each file, abort and let the user sort it out manually.
 if numel(ftLogFiles) > 1 || numel(ftDataFiles) > 1 || numel(ftVidFiles) > 1
    errordlg('Error: too many FicTrac output files in root experiment directory. No output files', ...
         ' from this trial have been moved or renamed.');
-elseif numel(ftLogFiles < 1) || numel(ftDataFiles < 1) || numel(ftVidFiles < 1)
+elseif numel(ftLogFiles) < 1 || numel(ftDataFiles) < 1 || numel(ftVidFiles) < 1
     errordlg('Error: one or more FicTrac output files is missing from the root experiment ', ...
             'directory. No output files from this trial have been moved or renamed.');
 else
     % Create new subdirectory for FicTrac data if it does not already exist
-    ftDataDir = fullfile(tS.saveDir, 'FicTracData');
-    if ~isfolder(ftDataDir)
+    ftDataDir = fullfile(mD.expDir, 'FicTracData');
+    if ~isdir(ftDataDir)
         mkdir(ftDataDir);
     end
     
@@ -172,8 +176,8 @@ else
     dataFileNames = {ftLogFiles.name, ftDataFiles.name, ftVidFiles.name};
     trialStr = pad(num2str(mD.trialNum), 3, 'left', '0');
     for iFile = 1:numel(dataFileNames)
-       sourceName = fullfile(tS.saveDir, dataFileNames{iFile}); 
-       destName = fullfile(ftDataDir, regexprep(dataFileNames{iFile}, '.', ['_', trialStr, '.']));
+       sourceName = fullfile(mD.expDir, dataFileNames{iFile}); 
+       destName = fullfile(ftDataDir, regexprep(dataFileNames{iFile}, '\.', ['_trial_', trialStr, '.']));
        movefile(sourceName, destName);
        disp(['Moved ', sourceName, ' to ', destName]);
     end    

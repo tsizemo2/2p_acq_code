@@ -59,7 +59,7 @@ mD = []; mD.trialSettings = tS; % Variable for recording metadata about the tria
 
 % Check whether there is an existing directory with the same date and exp num
 mD.expID = [datestr(now, 'yyyymmdd'), '-', num2str(tS.expNum)];
-expIDDir = dir(fullfile(ts.saveDir, [mD.expID, '*']));
+expIDDir = dir(fullfile(tS.saveDir, [mD.expID, '*']));
 
 % If yes, make sure it also has the same experiment name and abort trial if it doesn't. 
 % If no, create a new directory for the experiment.
@@ -68,7 +68,7 @@ if ~isempty(expIDDir) && ~strcmp(expIDDir(1).name, expDirName)
     errordlg('Error: an experiment with the same date and number but a different name', ...
                 ' already exists in the save directory...aborting trial.', 'Error')
     return
-elseif ~isfolder(expDirName)
+elseif ~isdir(expDirName)
     % Create the experiment directory if it does not already exist
     mkdir(fullfile(tS.saveDir, expDirName));
     disp('Creating new experiment directory...')
@@ -76,7 +76,7 @@ end
 mD.expDirName = expDirName;
 
 % Determine next trial number by looking at previously saved metadata files
-mdFiles = dir(fullfile(ts.SaveDir, expDirName, 'metadata*.mat'));
+mdFiles = dir(fullfile(tS.saveDir, expDirName, 'metadata*.mat'));
 fileNames = {mdFiles.name};
 if ~isempty(fileNames)
     regexStr = '(?<=trial_).*(?=\.mat)';
@@ -105,28 +105,13 @@ end
 if tS.usingPanels
     disp('Configuring panels...')
     configure_panels(tS.patternNum, 'DisplayRate', tS.displayRate, 'InitialPos', tS.initialPos, ...
-            'PanelMode', tS.panelMode, 'PosFunNumX', ts.xDimPosFun, 'PosFunNumY', ts.yDimPosFun);
+            'PanelMode', tS.panelMode, 'PosFunNumX', tS.xDimPosFun, 'PosFunNumY', tS.yDimPosFun);
 end
-
-
-
-%%%
-% Could also have it start running FicTrac here if I'm running it live and 
-% saving the output video. This would allow me to save the video for each
-% trial in a specific location/directory. I figured out that I can do this 
-% using system commands as in the following:
-%
-% cmdStr = 'cd "C:\Users\Wilson Lab\Documents\FicTrac_MM\data" & ..\bin\Release\fictrac.exe ..\config\config.txt &'
-% [status, cmdout] = system(cmdStr);
-%
-% And then after the trial is finished I can kill it automatically using:
-% system('taskkill /F /im fictrac.exe');
-%
-%%%
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
-cmdStr = ['cd "', ts.saveDir, '" & ', FT_PATH, ' config.txt &'];
+cmdStr = ['cd "', expIDDir, '" & "', FT_PATH, ...
+        '" config.txt &'];
 system(cmdStr);
 
 % Add some hardcoded session params
@@ -158,14 +143,17 @@ saveFileSuffix = ['_', datestr(now, 'HHMMSS'), '_trial_', ...
 save([saveFilePrefix, 'metadata', saveFileSuffix], mD, '-v7.3');
 save([saveFilePrefix, 'daqData', saveFileSuffix], trialData, outputData, columnLabels, '-v7.3');
 
+
+%%% ---------- PROCESS FICTRAC OUTPUT FILES ---------- %%%
+
 % Rename the FicTrac output files that were created during this trial and then move them to a 
 % dedicated subdirectory. There should be three output files from each trial: one .dat with the log, 
 % one .txt with the data, and one .avi with the raw video.
 
 % Identify the new output files in the main experiment directory
-ftLogFiles = dir(fullfile(tS.saveDir, 'fictrac*.dat'));
-ftDataFiles = dir(fullfile(tS.saveDir, 'fictrac*.txt'));
-ftVidFiles = dir(fullfile(tS.saveDir, 'fictrac*.avi'));
+ftLogFiles = dir(fullfile(expIDDir, 'fictrac*.dat'));
+ftDataFiles = dir(fullfile(expIDDir,  'fictrac*.txt'));
+ftVidFiles = dir(fullfile(expIDDir,  'fictrac*.avi'));
 
 % If there is not exactly one of each file, abort and let the user sort it out manually.
 if numel(ftLogFiles) > 1 || numel(ftDataFiles) > 1 || numel(ftVidFiles) > 1
@@ -176,32 +164,20 @@ elseif numel(ftLogFiles < 1) || numel(ftDataFiles < 1) || numel(ftVidFiles < 1)
             'directory. No output files from this trial have been moved or renamed.');
 else
     % Create new subdirectory for FicTrac data if it does not already exist
-    ftDataDir = fullfile(tS.saveDir, 'FicTracData');
-    if ~isfolder(ftDataDir)
+    ftDataDir = fullfile(expIDDir, 'FicTracData');
+    if ~isdir(ftDataDir)
         mkdir(ftDataDir);
     end
     
-    % Append trial number onto the end of the data files
+    % Append trial number onto the end of the data file names and move them to FicTracData folder
     dataFileNames = {ftLogFiles.name, ftDataFiles.name, ftVidFiles.name};
     trialStr = pad(num2str(mD.trialNum), 3, 'left', '0');
     for iFile = 1:numel(dataFileNames)
-       destName = fullfile(tS.save
-        
-    end
-    
-    movefile(fullfile(ts.saveDir, ftLogFiles(1).name)
-    
-    
-    % Move the files in to the FicTracData folder
-    
-    
+       sourceName = fullfile(tS.saveDir, dataFileNames{iFile}); 
+       destName = fullfile(ftDataDir, regexprep(dataFileNames{iFile}, '.', ['_', trialStr, '.']));
+       movefile(sourceName, destName);
+       disp(['Moved ', sourceName, ' to ', destName]);
+    end    
 end
-
-
-
-
-
-
-
 
 end
