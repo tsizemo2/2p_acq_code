@@ -18,6 +18,8 @@ function setup_panels_trial(trialSettings)
 %                             space replaced with hyphens)
 % 
 %     trialDuration         = duration of the trial in seconds
+%
+%     ftConfigFile          = the full path to the desired FicTrac config file
 % 
 %     using2P               = boolean specifying whether to connect to scanimage
 % 
@@ -76,18 +78,26 @@ end
 mD.expDirName = expDirName;
 mD.expDir = fullfile(tS.saveDir, expDirName);
 
+% Copy the FicTac config file to the experiment directory if it is not already there
+configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once');
+if ~exist(fullfile(mD.expDir, configFileName), 'file')
+    disp(tS.ftConfigFile)
+    disp(fullfile(mD.expDir, configFileName));
+    copyfile(tS.ftConfigFile, fullfile(mD.expDir, configFileName));
+end
+
 % Determine next trial number by looking at previously saved metadata files
-mdFiles = dir(fullfile(tS.saveDir, expDirName, 'metadata*.mat'));
+mdFiles = dir(fullfile(mD.expDir, '*metadata*.mat'));
 fileNames = {mdFiles.name};
 if ~isempty(fileNames)
-    regexStr = '(?<=trial_).*(?=\.mat)';
+    regexpStr = '(?<=trial_).*(?=\.mat)';
     % Strip out the padded trial numbers from each of the the file names
     trialNums = cellfun(@regexp, fileNames, ...
             repmat({regexpStr}, 1, numel(fileNames)), ...
-            repmat({'match'}, 1, numel(dirNames)), ...
+            repmat({'match'}, 1, numel(fileNames)), ...
             'uniformoutput', 0);
     % Find the max and add one to it to get the current trial number
-    mD.trialNum = max(cellfun(@str2double, trialNums), + 1);
+    mD.trialNum = max(cellfun(@str2double, trialNums))+ 1;
 else
     mD.trialNum = 1; % If no existing files, this must be the first trial
 end
@@ -105,18 +115,21 @@ end
 % Configure panels
 if tS.usingPanels
     disp('Configuring panels...')
-    configure_panels(tS.patternNum, 'DisplayRate', tS.displayRate, 'InitialPos', tS.initialPos, ...
-            'PanelMode', tS.panelMode, 'PosFunNumX', tS.xDimPosFun, 'PosFunNumY', tS.yDimPosFun);
+    configure_panels(tS.patternNum, 'DisplayRate', tS.displayRate, 'InitialPos', tS.initialPosition, ...
+            'PanelsMode', tS.panelsMode, 'PosFunNumX', tS.xDimPosFun, 'PosFunNumY', tS.yDimPosFun);
 end
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
-cmdStr = ['cd "', mD.expDir, '" & "', FT_PATH, ...
-        '" config.txt &'];
+cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
+        '" config.txt & exit'];
 system(cmdStr);
 
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
+
+disp(mD)
+tS.trialDuration
 
 % Run trial
 [trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
@@ -124,7 +137,7 @@ mD.SAMPLING_RATE = 10000;
 % Turn off panels if necessary
 if tS.usingPanels
    Panel_com('stop')
-   Panel_com('all off')
+   Panel_com('all_off')
 %    Panel_com('disable_extern_trig')
 end
 

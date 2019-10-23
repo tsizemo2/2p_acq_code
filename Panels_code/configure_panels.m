@@ -16,7 +16,7 @@ function configure_panels(patternNum, varargin)
 %                         value is 1-indexed, so the default [1 1] will start at the first 
 %                         pattern position.
 %
-%       'PanelMode'     = (default: 'OpenLoop') string specifying whether the panels will be 
+%       'PanelsMode'     = (default: 'OpenLoop') string specifying whether the panels will be 
 %                         operating under open loop or closed loop control.
 %
 %       'ClosedLoopDim' = (default: 'x') if in closed loop mode, the dimension of the pattern that 
@@ -34,14 +34,14 @@ function configure_panels(patternNum, varargin)
 p = inputParser;
 addParameter(p, 'DisplayRate', 200);
 addParameter(p, 'InitialPos', [1 1]); 
-addParameter(p, 'PanelMode', 'OpenLoop');
+addParameter(p, 'PanelsMode', 'OpenLoop');
 addParameter(p, 'ClosedLoopDim', 'x');
 addParameter(p, 'PosFunNumX', 1);
 addParameter(p, 'PosFunNumY', 1);
 parse(p, varargin{:});
 displayRate = p.Results.DisplayRate;
 initialPos = p.Results.InitialPos;
-panelMode = p.Results.PanelMode;
+panelsMode = p.Results.PanelsMode;
 closedLoopDim = p.Results.ClosedLoopDim;
 posFunNumX = p.Results.PosFunNumX;
 posFunNumY = p.Results.PosFunNumY;
@@ -70,11 +70,11 @@ pause(0.03)
 %   3 - external input sets position                       <-- CLOSED LOOP FOR OUR EXPERIMENTS
 %   4 - internal function generator sets velocity/position <-- OPEN LOOP FOR OUR EXPERIMENTS
 %   5 - interal function generator debug mode
-if strcmp(panelMode, 'OpenLoop')
+if strcmpi(regexprep(panelsMode, ' ', ''), 'OpenLoop')
     % Argument is [Xmode, Ymode]. Both dimensions will use the position functions provided.
     Panel_com('set_mode', [4, 4]) 
     pause(0.03)
-elseif strcmp(panelMode, 'ClosedLoop')
+elseif strcmpi(regexprep(panelsMode, ' ', ''), 'ClosedLoop')
     % Set one dimension to be under external closed loop control, and lock the other in its starting 
     % position.
     if strcmp(closedLoopDim, 'x')

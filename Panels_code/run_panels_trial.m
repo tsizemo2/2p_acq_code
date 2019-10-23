@@ -19,9 +19,8 @@ s.Rate = mD.SAMPLING_RATE;
 %   Dev1:
 %       P0.0        = "Start Acqusition" trigger for scanimage
 %       P0.6        = LED opto stim command
+%       P0.4        = trial alignment fiber LED
 %       P0.?        = panels start trigger?
-%       P0.?        = trial alignment fiber LED?
-
 
 %%% ---------- SET UP DAQ CHANNELS ---------- %%%
 
@@ -34,10 +33,11 @@ s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 % Output channel for opto stim LED
 s.addDigitalChannel('Dev1', 'port0/line6', 'OutputOnly');
 
+% Trial alignment LED command
+s.addDigitalChannel('Dev1', 'port0/line4', 'OutputOnly');
+
 % % Panels start trigger
 % s.addDigitalChannel('Dev1', 'port0/line ', 'OutputOnly');
-
-% TODO: add trial alignment LED for video alignment if necessary?
 
 % Create labels for columns of recorded data array
 columnLabels.in = {'PanelsXDimTelegraph', 'PanelsYDimTelegraph'};
@@ -83,16 +83,23 @@ if tS.usingOptoStim
     end%iStim
 end%if
 
+% Alignment IR LED command 
+alignLEDCommand = zeroStim;
+LEDOnSamples = mD.SAMPLING_RATE * 0.1; % LED on for first and last 100 ms of trial
+alignLEDCommand(1:LEDOnSamples) = 1;
+alignLEDCommand(end-LEDOnSamples:end) = 1;
+
 % % Panels
 % panelsStartTrigger = siStartTrigger % sending the same trigger command to scanimage and the panels
 
 % Create and queue output data array
-outputData = [siTrigger, optoStimCommand];
+outputData = [siTrigger, optoStimCommand, alignLEDCommand];
 outputData(end, :) = 0; % To make sure everything turns off at the end of the trial
 queueOutputData(s, outputData);
+s.Rate = mD.SAMPLING_RATE;
 
 % Create column labels for output data
-columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand'};
+columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand', 'AlignmentLEDCommand'};
 
 % Get scanimage ready if using 2P
 if tS.using2P
@@ -104,14 +111,14 @@ if tS.using2P
    pause(1)
    siClientResponse = fscanf(scanimageClient, '%s');
    disp('Read: ', siClientResponse, ' from scanimage server');
-end
-
-% Wait for another couple of seconds to make sure scanimage is really ready
+   
+   % Wait for another couple of seconds to make sure scanimage is really ready
 pause(2)
-
+end
 
 % Start the panels, immediately followed by the trial session
 Panel_com('start');
+tic
 [trialData, ~] = s.startForeground();
 release(s);
 
