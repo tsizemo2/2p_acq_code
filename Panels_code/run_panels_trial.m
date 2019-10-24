@@ -11,8 +11,8 @@ s.Rate = mD.SAMPLING_RATE;
 
 % Input channels:
 %   Dev1:
-%       AI.4  = Panels X dim position telegraph
-%       AI.5  = Panels Y dim position telegraph
+%       AI.11  = Panels X dim position telegraph
+%       AI.12  = Panels Y dim position telegraph
 %
 % Output channels:
 %
@@ -25,7 +25,7 @@ s.Rate = mD.SAMPLING_RATE;
 %%% ---------- SET UP DAQ CHANNELS ---------- %%%
 
 % Add analog input channels for panels position telegraph outputs
-s.addAnalogInputChannel('Dev1', 4:5, 'Voltage');
+s.addAnalogInputChannel('Dev1', 11:12, 'Voltage');
 
 % This channel is for external triggering of scanimage
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
@@ -67,6 +67,10 @@ if tS.usingOptoStim
     allStimStartSamples = startSample:(stimDurSamples + isiSamples):numel(zeroStim);
     allStimEndSamples = allStimStartSamples + stimDurSamples;
     
+    % Cut off any stims that are interrupted by the end of the trial
+    allStimStartSamples(allStimStartSamples >= (numel(zeroStim) - stimDurSamples)) = [];
+    allStimEndSamples(allStimEndSamples >= numel(zeroStim)) = [];
+    
     % Fill in stimulus epochs in command vector, using PWM if appropriate
     for iStim = 1:numel(allStimStartSamples)
         if tS.usePWM
@@ -91,7 +95,9 @@ alignLEDCommand(end-LEDOnSamples:end) = 1;
 
 % % Panels
 % panelsStartTrigger = siStartTrigger % sending the same trigger command to scanimage and the panels
-
+disp(numel(siTrigger))
+disp(numel(optoStimCommand))
+disp(numel(alignLEDCommand))
 % Create and queue output data array
 outputData = [siTrigger, optoStimCommand, alignLEDCommand];
 outputData(end, :) = 0; % To make sure everything turns off at the end of the trial
@@ -118,7 +124,6 @@ end
 
 % Start the panels, immediately followed by the trial session
 Panel_com('start');
-tic
 [trialData, ~] = s.startForeground();
 release(s);
 

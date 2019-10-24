@@ -46,12 +46,12 @@ closedLoopDim = p.Results.ClosedLoopDim;
 posFunNumX = p.Results.PosFunNumX;
 posFunNumY = p.Results.PosFunNumY;
 
-% Set pattern number
-Panel_com('set_pattern_id', patternNum);
-pause(0.03)
-
 % Set initial position
 Panel_com('set_position',  initialPos) % Panel_com will convert this from 1-indexed to 0-indexed
+pause(0.03)
+
+% Set pattern number
+Panel_com('set_pattern_id', patternNum);
 pause(0.03)
 
 % Set X and Y position functions. Function #1 should always be a static vector telling the panels to 

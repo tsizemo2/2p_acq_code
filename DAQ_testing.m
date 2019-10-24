@@ -33,7 +33,7 @@ s.Rate = SAMPLING_RATE;
 
 % outputData = [zeroStim, chanACommand, chanBCommand, chanBCommand, chanACommand, dummyCommand];
 % outputData(end, :) = 0; % To make sure the DAQ doesn't stay on between trials
-outputData = [ones(100000,1)*10, ones(100000, 1)];
+outputData = [ones(10000,1)*10, ones(10000, 1)];
 outputData(end, :) = 0;
 queueOutputData(s, outputData);
 

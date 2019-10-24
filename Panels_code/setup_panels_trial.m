@@ -24,19 +24,24 @@ function setup_panels_trial(trialSettings)
 %     using2P               = boolean specifying whether to connect to scanimage
 % 
 %     usingPanels           = boolean specifying whether visual panels will be used
+%
+%          pattern          = the pattern data that will be used as the visual panels stimulus
 % 
-%          patternNum       = number of the pattern to use as the visual panels stimulus
+%          patternNum       = number of the pattern to give to the panels controller
 % 
 %          initialPosition  = the starting [X,Y] index of panels pattern to be displayed
 % 
 %          displayRate      = update rate of the panels
 % 
 %          panelsMode       = 'open loop' or 'closed loop'
+%
+%          xDimPosFun       = the position function vector for movement through the X dimension of the pattern
 % 
-%          xDimPosFun       = number of the position function for movement through the X dimension 
-%                             of the pattern
-%                             
+%          xDimPosFunNum    = number of the X dim position function to give to the panels controller
+%
 %          yDimPosFun       = same, but for Y dimension
+%
+%          yDimPosFunNum    = same, but for Y dimension
 % 
 %     usingOptoStim         = boolean specifying whether a 1P opto LED stim will be used
 % 
@@ -116,7 +121,7 @@ end
 if tS.usingPanels
     disp('Configuring panels...')
     configure_panels(tS.patternNum, 'DisplayRate', tS.displayRate, 'InitialPos', tS.initialPosition, ...
-            'PanelsMode', tS.panelsMode, 'PosFunNumX', tS.xDimPosFun, 'PosFunNumY', tS.yDimPosFun);
+            'PanelsMode', tS.panelsMode, 'PosFunNumX', tS.xDimPosFunNum, 'PosFunNumY', tS.yDimPosFunNum);
 end
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
