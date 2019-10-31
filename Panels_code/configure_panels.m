@@ -51,7 +51,7 @@ Panel_com('set_position',  initialPos) % Panel_com will convert this from 1-inde
 pause(0.03)
 
 % Set pattern number
-Panel_com('set_pattern_id', patternNum);
+Panel_com('set_pattern_id', patternNum); % TODO: panels turn on and display the first pattern position here
 pause(0.03)
 
 % Set X and Y position functions. Function #1 should always be a static vector telling the panels to 
@@ -94,6 +94,7 @@ else
 end
 
 % Set display update frequency
+disp(whos('displayRate'))
 Panel_com('set_funcy_freq', displayRate);
 pause(0.03);
 Panel_com('set_funcx_freq', displayRate);
@@ -103,5 +104,4 @@ pause(0.03);
 %  Panel_com('enable_extern_trig');
 % Panel_com('start');
 % pause(0.03);
-
 end

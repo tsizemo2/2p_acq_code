@@ -21,10 +21,10 @@ load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
 %% STEADY MOTION
 % Moves along target pattern dimension at a steady rate (useful for swinging bar/object stimuli)
 
-functionName = 'steadyMotion_dispRate-200_cycleTime-20_framesPerPos-42';
+functionName = 'steadyMotion_dispRate-50_cycleTime-20_framesPerPos-10';
 functionNum = 1;
 
-displayRate = 200;
+displayRate = 50;
 positionsPerCycle = HORZ_LED_COUNT;
 cycleTime = 20; % this is the desired time to complete one cycle through the target dimension at 
 % displayRate. NOTE: actual cycle time will be slightly different to ensure that the same integer 
@@ -48,14 +48,17 @@ func = positionArray; % Needs to be named this for panels code to read it
 %% STATIC
 % Stays at the initial position without moving
 
-functionName = 'static_framesPerCycle-1000';
+functionName = 'static_offset-1_framesPerCycle-1000';
 functionNum = 2;
 
 framesPerCycle = 1000;
 
-positionArray = zeros(1, framesPerCycle);
+% positionArray = zeros(1, framesPerCycle);
+positionArray = ones(1, framesPerCycle);
 
 func = positionArray;
+
+
 
 %% SAVE POSITION FUNCTION
 

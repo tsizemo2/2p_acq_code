@@ -129,6 +129,7 @@ FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
 cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
         '" config.txt & exit'];
 system(cmdStr);
+pause(2);
 
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
@@ -143,7 +144,7 @@ tS.trialDuration
 if tS.usingPanels
    Panel_com('stop')
    Panel_com('all_off')
-%    Panel_com('disable_extern_trig')
+   Panel_com('disable_extern_trig')
 end
 
 % Kill FicTrac execution

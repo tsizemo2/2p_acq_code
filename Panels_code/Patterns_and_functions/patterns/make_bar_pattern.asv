@@ -38,7 +38,7 @@ barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - eith
 % Add general info to pattern structure
 pattern = [];
 pattern.x_num = HORZ_LED_COUNT; % Specifies X index of the left edge of the bar
-pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the bar
+pattern.y_num = 2;              % Binary variable specifying whether to show (1) or hide (2) the bar
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
 pattern.Panel_map = PANEL_ADDRESS_MAP;
