@@ -19,7 +19,7 @@ s.Rate = mD.SAMPLING_RATE;
 %   Dev1:
 %       P0.0        = "Start Acqusition" trigger for scanimage
 %       P0.6        = LED opto stim command
-%       P0.4        = trial alignment fiber LED
+%       P0.5        = trial alignment fiber LED
 %       P0.8        = panels start trigger (this is "P0.0" on the second BNC-2090A)
 
 %%% ---------- SET UP DAQ CHANNELS ---------- %%%
@@ -31,7 +31,7 @@ s.addAnalogInputChannel('Dev1', 20:21, 'Voltage');
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
 % Output channel for opto stim LED
-s.addDigitalChannel('Dev1', 'port0/line6', 'OutputOnly');
+s.addDigitalChannel('Dev1', 'port0/line5', 'OutputOnly');
 
 % Trial alignment LED command
 s.addDigitalChannel('Dev1', 'port0/line4', 'OutputOnly');
@@ -116,7 +116,7 @@ if tS.using2P
    disp(['Wrote: ', siFileStr, ' to scanimage server']);
    pause(1)
    siClientResponse = fscanf(scanimageClient, '%s');
-   disp('Read: ', siClientResponse, ' from scanimage server');
+   disp(['Read: ', siClientResponse, ' from scanimage server']);
    
    % Wait for another couple of seconds just to make sure scanimage is really ready
     pause(2)

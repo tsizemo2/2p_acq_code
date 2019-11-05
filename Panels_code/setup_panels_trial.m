@@ -112,6 +112,7 @@ end
 if tS.using2P
     disp('Connecting to scanimage server...')
     scanimageClientSkt = tcpip('cassowary.med.harvard.edu', 30000, 'NetworkRole', 'client');
+    fopen(scanimageClientSkt);
     flushinput(scanimageClientSkt);
 else
     scanimageClientSkt = [];
