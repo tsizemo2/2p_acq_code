@@ -88,7 +88,7 @@ configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once'
 if ~exist(fullfile(mD.expDir, configFileName), 'file')
     disp(tS.ftConfigFile)
     disp(fullfile(mD.expDir, configFileName));
-    copyfile(tS.ftConfigFile, fullfile(mD.expDir, configFileName));
+    copyfile(tS.ftConfigFile, fullfile(mD.expDir, 'config.txt'));
 end
 
 % Determine next trial number by looking at previously saved metadata files
@@ -126,7 +126,7 @@ if tS.usingPanels
 end
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
-FT_PATH = 'C:\Users\Wilson Lab\Documents\FicTrac_MM\bin\Release\fictrac.exe';
+FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe';
 cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
         '" config.txt & exit'];
 system(cmdStr);
