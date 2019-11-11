@@ -196,7 +196,7 @@ else
     end
     
     % Append trial number onto the end of the data file names and move them to FicTracData folder
-    dataFileNames = {ftLogFiles.name, ftDataFiles.name, ftVidFiles.name, ftFrameLogFiles.name};
+    dataFileNames = {ftLogFiles.name, ftDataFiles.name, ftVidFiles.name, ftFrameLogFiles};
     trialStr = pad(num2str(mD.trialNum), 3, 'left', '0');
     for iFile = 1:numel(dataFileNames)
        sourceName = fullfile(mD.expDir, dataFileNames{iFile}); 
