@@ -89,9 +89,8 @@ end%if
 
 % Alignment IR LED command 
 alignLEDCommand = zeroStim;
-LEDOnSamples = mD.SAMPLING_RATE * 0.1; % LED on for first and last 100 ms of trial
+LEDOnSamples = mD.SAMPLING_RATE * 0.1; % LED on for first 100 ms of each trial
 alignLEDCommand(1:LEDOnSamples) = 1;
-alignLEDCommand(end-LEDOnSamples:end) = 1;
 
 % % Panels
 panelsStartTrigger = siTrigger; % sending the same trigger command to scanimage and the panels
