@@ -144,8 +144,8 @@ tS.trialDuration
 % Turn off panels if necessary
 if tS.usingPanels
    Panel_com('stop')
-   Panel_com('all_off')
    Panel_com('disable_extern_trig')
+   Panel_com('all_off')
 end
 
 % Kill FicTrac execution
@@ -170,8 +170,8 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'co
 %%% ---------- PROCESS FICTRAC OUTPUT FILES ---------- %%%
 
 % Rename the FicTrac output files that were created during this trial and then move them to a 
-% dedicated subdirectory. There should be three output files from each trial: one .dat with the log, 
-% one .txt with the data, and one .avi with the raw video.
+% dedicated subdirectory. There should be four output files from each trial: one .dat with the data, 
+% one .log with the log, one .txt with the video frame log, and one .avi with the raw video.
 
 % Identify the new output files in the main experiment directory
 ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));

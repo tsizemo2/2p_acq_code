@@ -122,7 +122,7 @@ if tS.using2P
     pause(2)
 end
 
-% Enable the panels start trigger, then start them
+% Enable the panels start trigger
 Panel_com('enable_extern_trig');
 pause(0.3)
 
