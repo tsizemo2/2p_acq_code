@@ -135,13 +135,11 @@ pause(2);
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
 
-% disp(mD)
-% tS.trialDuration
+disp(mD)
+tS.trialDuration
 
 % Run trial
-disp(['Starting trial #', num2str(mD.trialNum), ' at ', datestr(now, 'HH:MM:SS PM')])
-daysPerSec = 1 * (1/24) * (1/60) * (1/60);
-disp(['Trial end time: ' datestr(now + (tS.trialDuration * daysPerSec), 'HH:MM:SS PM')])
+disp(['Starting trial #', num2str(mD.trialNum, ' at ', datestr(now, 'HH:MM:SS PM')])
 [trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
 
 % Turn off panels if necessary
@@ -153,12 +151,13 @@ end
 
 % Kill FicTrac execution
 % system('taskkill /F /im fictrac.exe');
-[~, cmdOut] = system('tasklist | findstr /i "fictrac.exe"');
-% [~, cmdOut] = system('tasklist | findstr /i "fiji-win64.exe"');
+% [~, cmdOut] = system('tasklist | findstr /i "fictrac.exe"');
+[~, cmdOut] = system('tasklist | findstr /i "fiji-win64.exe"');
 cmdOut = strsplit(cmdOut);
 pid = cmdOut{2};
 system(['"C:\Users\Wilson Lab\Desktop\windows-kill.exe" -SIGINT ', pid])
-pause(0.5)
+
+
 
 % Close scanimage connection
 if tS.using2P
@@ -185,7 +184,7 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'co
 % Identify the new output files in the main experiment directory
 ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));
 ftDataFiles = dir(fullfile(mD.expDir, 'fictrac*.log'));
-ftVidFiles = dir(fullfile(mD.expDir, 'fictrac*.mp4'));
+ftVidFiles = dir(fullfile(mD.expDir, 'fictrac*.avi'));
 ftFrameLogFiles = dir(fullfile(mD.expDir, 'fictrac-vidLogFrames*.txt'));
 
 % If there is not exactly one of each file, abort and let the user sort it out manually.
