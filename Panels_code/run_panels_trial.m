@@ -123,8 +123,10 @@ if tS.using2P
 end
 
 % Enable the panels start trigger
-Panel_com('enable_extern_trig');
-pause(0.3)
+if tS.usingPanels
+    Panel_com('enable_extern_trig');
+    pause(0.3)
+end
 
 % Start the session
 [trialData, ~] = s.startForeground();

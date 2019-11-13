@@ -176,7 +176,7 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'co
 % Identify the new output files in the main experiment directory
 ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));
 ftDataFiles = dir(fullfile(mD.expDir, 'fictrac*.log'));
-ftVidFiles = dir(fullfile(mD.expDir, 'fictrac*.avi'));
+ftVidFiles = dir(fullfile(mD.expDir, 'fictrac*.mp4'));
 ftFrameLogFiles = dir(fullfile(mD.expDir, 'fictrac-vidLogFrames*.txt'));
 
 % If there is not exactly one of each file, abort and let the user sort it out manually.
