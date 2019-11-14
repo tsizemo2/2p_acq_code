@@ -5,7 +5,7 @@
 parentDir = 'C:\Users\Wilson Lab\Documents\fictrac-develop\testing';
 
 prefixes = {'mjpg'};%{'xvid', 'mpg4', 'mjpg', 'raw', 'xvid2'};
-suffixes = {'avi'};%{'avi', 'mp4', 'avi', 'avi', 'avi'};
+suffixes = {'mp4'};%{'avi', 'mp4', 'avi', 'avi', 'avi'};
 
 % dataFile = 'fictrac-20191111_145129.csv';
 % vidFile = 'fictrac-raw-20191111_145129.avi';

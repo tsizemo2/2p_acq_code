@@ -75,7 +75,7 @@ if tS.usingOptoStim
     for iStim = 1:numel(allStimStartSamples)
         if tS.usePWM
             pwmPeriodSamples = round(mD.SAMPLING_RATE / tS.PWMFreq);
-            pulseWidth = round(pwmPeriodSamples * (tS.PWMDutyCycle / 100));
+            pulseWidth = round(pwmPeriodSamples * (double(tS.PWMDutyCycle) / 100));
             for iSamp = 1:pulseWidth
                currStart = allStimStartSamples(iStim);
                currEnd = allStimEndSamples(iStim);
