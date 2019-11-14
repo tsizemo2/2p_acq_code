@@ -86,8 +86,8 @@ mD.expDir = fullfile(tS.saveDir, expDirName);
 % Copy the FicTac config file to the experiment directory if it is not already there
 configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once');
 if ~exist(fullfile(mD.expDir, configFileName), 'file')
-    disp(tS.ftConfigFile)
-    disp(fullfile(mD.expDir, configFileName));
+%     disp(tS.ftConfigFile)
+%     disp(fullfile(mD.expDir, configFileName));
     copyfile(tS.ftConfigFile, fullfile(mD.expDir, 'config.txt'));
 end
 
@@ -135,9 +135,6 @@ pause(2);
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
 
-% disp(mD)
-% tS.trialDuration
-
 % Run trial
 disp(['Starting trial #', num2str(mD.trialNum), ' at ', datestr(now, 'HH:MM:SS PM')])
 daysPerSec = 1 * (1/24) * (1/60) * (1/60);
@@ -152,13 +149,10 @@ if tS.usingPanels
 end
 
 % Kill FicTrac execution
-% system('taskkill /F /im fictrac.exe');
 [~, cmdOut] = system('tasklist | findstr /i "fictrac.exe"');
-% [~, cmdOut] = system('tasklist | findstr /i "fiji-win64.exe"');
 cmdOut = strsplit(cmdOut);
 pid = cmdOut{2};
-system(['"C:\Users\Wilson Lab\Desktop\windows-kill.exe" -SIGINT ', pid])
-pause(0.5)
+system(['"C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\windows-kill.exe" -SIGINT ', pid]);
 
 % Close scanimage connection
 if tS.using2P
@@ -170,8 +164,8 @@ end
 saveFilePrefix = fullfile(mD.expDir, [mD.expID, '_']);
 saveFileSuffix = ['_', datestr(now, 'HHMMSS'), '_trial_', ...
         pad(num2str(mD.trialNum), 3, 'left', '0'), '.mat']; 
-disp(saveFilePrefix)
-disp(saveFileSuffix)
+% disp(saveFilePrefix)
+% disp(saveFileSuffix)
 save([saveFilePrefix, 'metadata', saveFileSuffix], 'mD', '-v7.3');
 save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'columnLabels', '-v7.3');
 
@@ -181,6 +175,9 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'co
 % Rename the FicTrac output files that were created during this trial and then move them to a 
 % dedicated subdirectory. There should be four output files from each trial: one .dat with the data, 
 % one .log with the log, one .txt with the video frame log, and one .avi with the raw video.
+
+% Pause to make sure FicTrac process has terminated
+pause(2)
 
 % Identify the new output files in the main experiment directory
 ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));
@@ -211,7 +208,7 @@ else
        sourceName = fullfile(mD.expDir, dataFileNames{iFile}); 
        destName = fullfile(ftDataDir, regexprep(dataFileNames{iFile}, '\.', ['_trial_', trialStr, '.']));
        movefile(sourceName, destName);
-       disp(['Moved ', sourceName, ' to ', destName]);
+%        disp(['Moved ', sourceName, ' to ', destName]);
     end    
 end
 
