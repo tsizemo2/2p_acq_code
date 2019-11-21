@@ -130,7 +130,7 @@ FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe
 cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
         '" config.txt & exit'];
 system(cmdStr);
-pause(2);
+pause(4);
 
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
