@@ -18,8 +18,8 @@ s.Rate = mD.SAMPLING_RATE;
 %
 %   Dev1:
 %       P0.0        = "Start Acqusition" trigger for scanimage
-%       P0.6        = LED opto stim command
-%       P0.5        = trial alignment fiber LED
+%       P0.5        = LED opto stim command
+%       P0.4        = trial alignment fiber LED
 %       P0.8        = panels start trigger (this is "P0.0" on the second BNC-2090A)
 
 %%% ---------- SET UP DAQ CHANNELS ---------- %%%

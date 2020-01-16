@@ -60,22 +60,12 @@ positionArray = ones(1, framesPerCycle) * offsetNum;
 func = positionArray;
 
 
-%% Timed index jump
-
-
-
-
-
 %% TIMED BINARY SWITCHING
-% Switches from 0 to 1 at specific frames of each cycle (useful for
+% Switches from 0 to 1 at sp (useful for
 % making a stimulus appear and disappear)
 
 functionName = '_dispRate-50_cycleTime-20';
 functionNum = 1;
-
-
-% ------------------------------------
-% Use for matching up with a "steady motion" pattern
 
 % Adjust these values to match up with a particular pattern
 framesPerCycle = 960;     
@@ -85,15 +75,22 @@ framesPerPosition = 10;
 onsetPositions = [20 44 68]; % Positions when function should switch to '1'
 offsetPositions = [21 45 69];% Positions when the function should switch back to '0'
 
-onsetFrames = onsetPositions * framesPerPosition;
-offsetFrames = (offsetPositions * framesPerPosition) - 1;
+
 % ------------------------------------
+
+actualCycleTime = (framesPerPosition * positionsPerCycle) / displayRate;
+actualFramesPerCycle = displayRate * actualCycleTime;
 
 % Create the position function array (note that it is zero indexed!)
 positionArray = zeros(1, framesPerCycle);
 for iOnset = 1:numel(onsetPositions)
-    positionArray(onsetFrames(iOnset):offsetFrames(iOnset)) = 1;
+    onsetFrame = onsetPositions(iOnset) * framesPerPosition;
+    offsetFrame = (offsetPositions(iOnset) * framesPerPosition) - 1;
+    positionArray(onsetFrame:offsetFrame) = 1;
 end
+
+
+
 
 func = positionArray; % Needs to be named this for panels code to read it
 

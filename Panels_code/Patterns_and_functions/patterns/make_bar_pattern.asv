@@ -19,31 +19,51 @@ load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
     % PANEL_ADDRESS_MAP = [23, 19, 15, 22, 18, 14, 21, 17, 13, 24, 20, 16; ...
 %                          11, 7, 3, 10, 6, 2, 9, 5, 1, 12, 8, 4];
 
+%% CREATE FULL FIELD FLASHING PATTERN
+
+patternName = 'All-Panels-On_Xdim-Brightness_Ydim-OnOff';
+patternNum = 6;
+
+gsVal = 4; % Always use this value for consistent indexing
+
+% Add general info to pattern structure
+pattern = [];
+pattern.x_num = 15;             % One for each possible brightness level
+pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the bar
+pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
+pattern.gs_val = gsVal;
+pattern.Panel_map = PANEL_ADDRESS_MAP;
+
+% Construct the dot patterns within each dimension
+Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --> [arenaY, arenaX, patternX, patternY]
+
+pattern = 
+
 %% CREATE MOVING BAR PATTERN
 
-patternName = 'bright_bar_height-16_width-2_brightness-33_Xdim-barPosCW_Ydim-barOnOff';
-patternNum = 1;
+patternName = 'bright_bar_height-16_width-2_brightness-27_Xdim-barPosCW_Ydim-barOnOff';
+patternNum = 6;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
-gsVal = 2;       % Specifies grey scale range mapping of the values in Pats:
+gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
-barBrightness = 1;          % Maps onto to the selected gsVal range
+barBrightness = 4;          % Maps onto to the selected gsVal range
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
 barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 % Add general info to pattern structure
 pattern = [];
 pattern.x_num = HORZ_LED_COUNT; % Specifies X index of the left edge of the bar
-pattern.y_num = 2;              % Binary variable specifying whether to show (1) or hide (2) the bar
+pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the bar
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
 pattern.Panel_map = PANEL_ADDRESS_MAP;
 
-% Construct the dot patterns within each dimention
+% Construct the dot patterns within each dimension
 Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --> [arenaY, arenaX, patternX, patternY]
 
 % Build intial bar pattern 
