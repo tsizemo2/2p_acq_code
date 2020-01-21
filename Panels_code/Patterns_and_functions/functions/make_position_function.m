@@ -60,39 +60,31 @@ positionArray = ones(1, framesPerCycle) * offsetNum;
 func = positionArray;
 
 
-%% Timed index jump
-
-
-
-
-
-%% TIMED BINARY SWITCHING
-% Switches from 0 to 1 at specific frames of each cycle (useful for
+%% TIMED INDEX JUMP
+% Switches from a "home" position to specific indices at arbitrary times (useful for
 % making a stimulus appear and disappear)
 
-functionName = '_dispRate-50_cycleTime-20';
+functionName = 'bar_flash_LRMid_500_msec_dur_dispRate-50_cycleTime-20';
+% functionName = 'full_field_flash_Dur-250-msec_ITI-5-sec_dispRate-50_cycleTime_5';
 functionNum = 1;
 
+homePosition = 97;
+targetPositions = [20 68 44];
+onsetTimes = [3 10 17];
+offsetTimes = [3.5, 10.5, 17.5];
 
-% ------------------------------------
-% Use for matching up with a "steady motion" pattern
+displayRate = 50;
+cycleTime = 20;
 
-% Adjust these values to match up with a particular pattern
-framesPerCycle = 960;     
-framesPerPosition = 10;
-
-% Note that each onset must have a matching offset before the next onset
-onsetPositions = [20 44 68]; % Positions when function should switch to '1'
-offsetPositions = [21 45 69];% Positions when the function should switch back to '0'
-
-onsetFrames = onsetPositions * framesPerPosition;
-offsetFrames = (offsetPositions * framesPerPosition) - 1;
-% ------------------------------------
+% Convert times to frames
+onsetFrames = onsetTimes * displayRate;
+offsetFrames = offsetTimes * displayRate;
 
 % Create the position function array (note that it is zero indexed!)
-positionArray = zeros(1, framesPerCycle);
-for iOnset = 1:numel(onsetPositions)
-    positionArray(onsetFrames(iOnset):offsetFrames(iOnset)) = 1;
+framesPerCycle = displayRate * cycleTime;
+positionArray = ones(1, framesPerCycle) * homePosition;
+for iOnset = 1:numel(onsetFrames)
+    positionArray(onsetFrames(iOnset):offsetFrames(iOnset)) = targetPositions(iOnset);
 end
 
 func = positionArray; % Needs to be named this for panels code to read it

@@ -30,7 +30,7 @@ gsVal = 4; % Always use this value for consistent indexing
 % Add general info to pattern structure
 pattern = [];
 pattern.x_num = 15;             % One for each possible brightness level
-pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the bar
+pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the pattern
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
 pattern.Panel_map = PANEL_ADDRESS_MAP;
@@ -52,9 +52,9 @@ pattern.userData.patternName = patternName;
 pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;
 pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
 
-%% CREATE MOVING BAR PATTERN
+%% CREATE BAR PATTERN
 
-patternName = 'bright_bar_height-16_width-2_brightness-27_Xdim-barPosCW_Ydim-barOffOn';
+patternName = 'Bar_height-16_width-2_Xdim-barPosCW_Ydim-brightness';
 patternNum = 6;
 
 barWidth = 2;               % bar width in LEDs
@@ -64,14 +64,13 @@ gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
-barBrightness = 4;          % Maps onto to the selected gsVal range
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
 barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 % Add general info to pattern structure
 pattern = [];
-pattern.x_num = HORZ_LED_COUNT; % Specifies X index of the left edge of the bar
-pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the bar
+pattern.x_num = HORZ_LED_COUNT + 1; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
+pattern.y_num = 16;              % Brightness of the bar from 0-15 (0 turns the bar off)
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
 pattern.Panel_map = PANEL_ADDRESS_MAP;
@@ -81,14 +80,14 @@ Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --
 
 % Build intial bar pattern 
 barPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
-barPattern(barYpos, 1:barWidth) = barBrightness;
+barPattern(barYpos, 1:barWidth) = 1;
 
-% Fill pattern array by shifting bar pattern clockwise by one LED as X index increases
+% Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
 for xPos = 1:HORZ_LED_COUNT
     if strcmpi(barMotionDirection, 'cw')
-        Pats(:, :, xPos, 2) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
+        Pats(:, :, xPos, :) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
     elseif strcmpi(barMotionDirection, 'ccw')
-        Pats(:, :, xPos, 2) = ShiftMatrix(barPattern, xPos - 1, 'l', 'y');
+        Pats(:, :, xPos, :) = ShiftMatrix(barPattern, xPos - 1, 'l', 'y');
     else
         error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
     end
@@ -108,10 +107,15 @@ for iPos = 1:barWidth
             = barBrightness;
 end
 
-% Keep the "jumping" pard of the bar waiting on the other side until the actual bar pos catches up
+% Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
 nextBarPos = nextXPos:(nextXPos + barWidth - 1);
 Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 2) = barBrightness;
 % --------------------------------------------------------------------------------------------------
+
+% Adjust brightness values along the Y dimension
+for iY = 1:16
+    Pats(:, :, :, iY) = iY - 1;
+end
 
 % Add remaining data to pattern structure
 pattern.Pats = Pats;
