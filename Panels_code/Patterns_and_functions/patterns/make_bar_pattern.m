@@ -29,7 +29,7 @@ gsVal = 4; % Always use this value for consistent indexing
 
 % Add general info to pattern structure
 pattern = [];
-pattern.x_num = 15;             % One for each possible brightness level
+pattern.x_num = 16;             % One for each possible brightness level
 pattern.y_num = 2;              % Binary variable specifying whether to hide (1) or show (2) the pattern
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
@@ -38,7 +38,7 @@ pattern.Panel_map = PANEL_ADDRESS_MAP;
 % Fill in full arena for various brightness values
 Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --> [arenaY, arenaX, patternX, patternY]
 for iPos = 1:pattern.x_num
-    Pats(:, :, iPos, 2) = iPos;
+    Pats(:, :, iPos, 2) = iPos-1;
 end
 
 % Add remaining data to pattern structure
@@ -55,7 +55,7 @@ pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
 %% CREATE BAR PATTERN
 
 patternName = 'Bar_height-16_width-2_Xdim-barPosCW_Ydim-brightness';
-patternNum = 6;
+patternNum = 8;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
@@ -85,9 +85,9 @@ barPattern(barYpos, 1:barWidth) = 1;
 % Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
 for xPos = 1:HORZ_LED_COUNT
     if strcmpi(barMotionDirection, 'cw')
-        Pats(:, :, xPos, :) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
+        Pats(:, :, xPos, 1) = ShiftMatrix(barPattern, xPos - 1, 'r', 'y');
     elseif strcmpi(barMotionDirection, 'ccw')
-        Pats(:, :, xPos, :) = ShiftMatrix(barPattern, xPos - 1, 'l', 'y');
+        Pats(:, :, xPos, 1) = ShiftMatrix(barPattern, xPos - 1, 'l', 'y');
     else
         error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
     end
@@ -103,19 +103,20 @@ nextXPos = MISSING_PANEL_X_INDS(end) + 1;
 % panel locations.
 for iPos = 1:barWidth
     nextBarPos = nextXPos:(nextXPos + iPos - 1);
-    Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 2) ...
-            = barBrightness;
+    Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
+            = 1;
 end
 
 % Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
 nextBarPos = nextXPos:(nextXPos + barWidth - 1);
-Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 2) = barBrightness;
+Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
 % --------------------------------------------------------------------------------------------------
 
 % Adjust brightness values along the Y dimension
-for iY = 1:16
-    Pats(:, :, :, iY) = iY - 1;
+for iY = 2:16
+    Pats(:, :, :, iY) = Pats(:, :, :, 1) .* (iY - 1);
 end
+Pats(:, :, :, 1) = 0; % Blank pattern when y=0
 
 % Add remaining data to pattern structure
 pattern.Pats = Pats;
@@ -127,7 +128,6 @@ pattern.userData.patternNum = patternNum;
 pattern.userData.patternName = patternName;
 pattern.userData.barWidth = barWidth;
 pattern.userData.barYpos = barYpos;
-pattern.userData.barBrightness = barBrightness;
 pattern.userData.barMotionDirection = barMotionDirection;
 pattern.userData.backgroundBrightness = backgroundBrightness;
 pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;

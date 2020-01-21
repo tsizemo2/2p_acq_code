@@ -64,27 +64,34 @@ func = positionArray;
 % Switches from a "home" position to specific indices at arbitrary times (useful for
 % making a stimulus appear and disappear)
 
-functionName = 'bar_flash_LRMid_500_msec_dur_dispRate-50_cycleTime-20';
-% functionName = 'full_field_flash_Dur-250-msec_Dur-5-sec_dispRate-50_cycleTime_5';
-functionNum = 1;
+% functionName = 'bar_flash_LRMid_500_msec_dur_dispRate-50_cycleTime-20';
+functionName = 'full_field_flash_Dur-100-msec_Onset_3-sec_Brightness_100_dispRate-50_cycleTime_5';
+functionNum = 8;
 
-homePosition = 97;
-targetPositions = [20 68 44];
-onsetTimes = [3 10 17];
-offsetTimes = [3.5, 10.5, 17.5];
+homePosition = 1;
+targetPositions = [15];
+onsetTimes = [3];
+offsetTimes = [3.5];
+
+% homePosition = 97;
+% targetPositions = [20 68 44];
+% onsetTimes = [3 10 17];
+% offsetTimes = [3.5, 10.5, 17.5];
+
 
 displayRate = 50;
+% cycleTime = 5;
 cycleTime = 20;
 
 % Convert times to frames
-onsetFrames = onsetTimes * displayRate;
-offsetFrames = offsetTimes * displayRate;
+onsetFrames = ceil(onsetTimes * displayRate);
+offsetFrames = ceil(offsetTimes * displayRate);
 
 % Create the position function array (note that it is zero indexed!)
-framesPerCycle = displayRate * cycleTime;
+framesPerCycle = ceil(displayRate * cycleTime);
 positionArray = ones(1, framesPerCycle) * homePosition;
 for iOnset = 1:numel(onsetFrames)
-    positionArray(onsetFrames(iOnset):offsetFrames(iOnset)) = targetPositions(iOnset);
+    positionArray(onsetFrames(iOnset):offsetFrames(iOnset)) = targetPositions(iOnset) - 1;
 end
 
 func = positionArray; % Needs to be named this for panels code to read it
