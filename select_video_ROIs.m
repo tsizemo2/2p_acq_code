@@ -2,13 +2,12 @@ function roiData = select_video_ROIs(parentDir)
 %===================================================================================================
 % DEFINE ROI FOR FLY MOVEMENT IN BEHAVIOR VIDEO 
 %
-% Prompts the user to draw an ROI on a frame of the behavior video for the purposes of analyzing 
+% Prompts the user to draw an ROI on a frame of behavior video for the purposes of analyzing 
 % optic flow. The ROI should be drawn around the area where fly movement is occuring, ideally 
-% avoiding areas that the ball might enter if it shakes/bounces. Saves the ROI mask for future use 
-% in creation of combined optic flow + behavior videos.
+% avoiding areas that the ball might enter if it shakes/bounces. Saves the ROI mask for future use.
 %
 % INPUTS:
-%   parentDir = the directory containing the snapshot of the behavior video
+%   parentDir = (default: prompt user) the directory containing the behavior video
 %
 %===================================================================================================
 
