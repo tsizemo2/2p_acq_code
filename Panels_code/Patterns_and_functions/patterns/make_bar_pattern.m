@@ -149,6 +149,26 @@ pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
 
 catch ME; rethrow(ME); end
 
+
+%% CREATE HIGH-LOW OPPOSING DOTS PATTERN
+
+patternName = 'high-low-dots_size-2x2_yPos_1-2_9-10_Xdim-dotPos_top-CW_Ydim-brightness';
+patternNum = 17;
+
+dotSize = 2;               % dot width in LEDs
+
+% Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
+topDotYpos = 1:2;
+bottomDotYpos = 11:12;
+gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
+                    %   1: binary (0-1) 
+                    %   2: 0-3
+                    %   3: 0-7
+                    %   4: 0-15
+backgroundBrightness = 0;   % Maps onto to the selected gsVal range
+barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+
+
 %% SAVE PATTERN
 
 fileNamePrefix = ['Pattern_', pad(num2str(patternNum), 3, 'left', '0')];
