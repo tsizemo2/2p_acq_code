@@ -22,6 +22,7 @@ load(fullfile(paramFilePath, 'arena_setup_parameters.mat'));
 
 %% CREATE FULL FIELD ILLUMINATION PATTERN
 
+try
 patternName = 'All-Panels-On_Xdim-Brightness_Ydim-OnOff';
 patternNum = 7;
 
@@ -52,21 +53,24 @@ pattern.userData.patternName = patternName;
 pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;
 pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
 
+catch ME; rethrow(ME); end
+
 %% CREATE BAR PATTERN
 
-patternName = 'Bar_height-16_width-2_Xdim-barPosCW_Ydim-brightness';
-patternNum = 8;
+patternName = 'dot_size-2x2_yPos_11-12_Xdim-dotPosCCW_Ydim-brightness';
+patternNum = 16;
 
 barWidth = 2;               % bar width in LEDs
-barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
+barYpos = 11:12; %1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
 gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
-barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
+try
 % Add general info to pattern structure
 pattern = [];
 pattern.x_num = HORZ_LED_COUNT + 1; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
@@ -98,18 +102,28 @@ end
 % arena constant
 nextXPos = MISSING_PANEL_X_INDS(end) + 1;
 
+if strcmpi(barMotionDirection, 'ccw')
+   MISSING_PANEL_X_INDS = 10:17;
+   
+end
+
 % Split the bar to create a smoother transition on the side of the missing panel that is closer to 
 % the fly's visual field (i.e. more anterior). It might not make sense to do this for other missing
 % panel locations.
-for iPos = 1:barWidth
-    nextBarPos = nextXPos:(nextXPos + iPos - 1);
-    Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
+yFillInds = MISSING_PANEL_Y_INDS(ismember(MISSING_PANEL_Y_INDS, barYpos));
+if ~isempty(yFillInds)
+    for iPos = 1:barWidth
+        nextBarPos = nextXPos:(nextXPos + iPos - 1);
+        
+        
+        Pats(yFillInds, nextBarPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
             = 1;
+    end
+    
+    % Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
+    nextBarPos = nextXPos:(nextXPos + barWidth - 1);
+    Pats(yFillInds, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
 end
-
-% Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
-nextBarPos = nextXPos:(nextXPos + barWidth - 1);
-Pats(MISSING_PANEL_Y_INDS, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
 % --------------------------------------------------------------------------------------------------
 
 % Adjust brightness values along the Y dimension
@@ -132,6 +146,8 @@ pattern.userData.barMotionDirection = barMotionDirection;
 pattern.userData.backgroundBrightness = backgroundBrightness;
 pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;
 pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
+
+catch ME; rethrow(ME); end
 
 %% SAVE PATTERN
 
