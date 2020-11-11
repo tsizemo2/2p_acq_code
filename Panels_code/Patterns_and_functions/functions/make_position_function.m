@@ -64,23 +64,23 @@ func = positionArray;
 % Switches from a "home" position to specific indices at arbitrary times (useful for
 % making a stimulus appear and disappear)
 
-% functionName = 'bar_flash_LRMid_500_msec_dur_dispRate-50_cycleTime-20';
-functionName = 'full_field_flash_Dur-500-msec_Onset_3-sec_Brightness_100_dispRate-50_cycleTime_5';
-functionNum = 10;
+% functionName = 'bar_flash_LRMid_500_msec_dur_background_behind_dispRate-50_cycleTime-20';
+functionName = 'full_field_flash_Dur-250-msec_Onset_5-sec_Brightness_100_dispRate-50_cycleTime_10';
+functionNum = 13;
 
 homePosition = 1;
 targetPositions = [15];
-onsetTimes = [3];
-offsetTimes = [3.5];
+onsetTimes = [5];
+offsetTimes = [5.25];
 
-% homePosition = 97;
+% homePosition = 93;
 % targetPositions = [20 68 44];
 % onsetTimes = [3 10 17];
 % offsetTimes = [3.5, 10.5, 17.5];
 
 
 displayRate = 50;
-cycleTime = 5;
+cycleTime = 10;
 % cycleTime = 20;
 
 % Convert times to frames

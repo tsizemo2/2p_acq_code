@@ -19,6 +19,7 @@ s.Rate = mD.SAMPLING_RATE;
 %   Dev1:
 %       P0.0        = "Start Acqusition" trigger for scanimage
 %       P0.5        = LED opto stim command
+%       P0.2        = olfactometer command (shares opto stim timing settings)
 %       P0.4        = trial alignment fiber LED
 %       P0.8        = panels start trigger (this is "P0.0" on the second BNC-2090A)
 
@@ -32,6 +33,9 @@ s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
 % Output channel for opto stim LED
 s.addDigitalChannel('Dev1', 'port0/line5', 'OutputOnly');
+
+% Output channel for olfactometer command (shares opto stim settings)
+s.addDigitalChannel('Dev1', 'port0/line2', 'OutputOnly');
 
 % Trial alignment LED command
 s.addDigitalChannel('Dev1', 'port0/line4', 'OutputOnly');
@@ -97,10 +101,10 @@ alignLEDCommand(end-LEDOnSamples:end) = 1;
 panelsStartTrigger = siTrigger; % sending the same trigger command to scanimage and the panels
 
 % Create output data array
-outputData = [siTrigger, optoStimCommand, alignLEDCommand, panelsStartTrigger];
+outputData = [siTrigger, optoStimCommand, optoStimCommand, alignLEDCommand, panelsStartTrigger];
 
 % Create column labels for output data
-columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand', 'AlignmentLEDCommand', 'PanelsStartTrigger'};
+columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand', 'OlfactometerCommand', 'AlignmentLEDCommand', 'PanelsStartTrigger'};
 
 % Queue output data
 outputData(end, :) = 0; % To make sure everything turns off at the end of the trial
