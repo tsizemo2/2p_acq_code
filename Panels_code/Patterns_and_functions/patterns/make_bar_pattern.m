@@ -166,8 +166,84 @@ gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   3: 0-7
                     %   4: 0-15
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
-barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+topDotMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
+% Add general info to pattern structure
+pattern = [];
+pattern.x_num = HORZ_LED_COUNT + 1; % Specifies size of X index of the left edge of the bar (except for the last position, which blanks the panels)
+pattern.y_num = 16;              % Brightness of the dots from 0-15 (0 turns the bar off)
+pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
+pattern.gs_val = gsVal;
+pattern.Panel_map = PANEL_ADDRESS_MAP;
+
+% Construct the dot patterns within each dimension
+Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --> [arenaY, arenaX, patternX, patternY]
+
+%------------ FILL IN TOP DOT PATTERN ---------------------
+
+% Build intial dot pattern
+topDotPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
+topDotPattern(topDotYpos, 1:dotSize) = 1;
+
+% Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
+for xPos = 1:HORZ_LED_COUNT
+    if strcmpi(topDotMotionDirection, 'cw')
+        Pats(:, :, xPos, 1) = ShiftMatrix(topDotPattern, xPos - 1, 'r', 'y');
+    elseif strcmpi(topDotMotionDirection, 'ccw')
+        Pats(:, :, xPos, 1) = ShiftMatrix(topDotPattern, xPos - 1, 'l', 'y');
+    else
+        error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
+    end
+end
+
+% Make the LEDs from the upper row "jump" over the missing panel to keep total luminance within the 
+% arena constant
+nextXPos = MISSING_PANEL_X_INDS(end) + 1;
+
+if strcmpi(topDotMotionDirection, 'ccw')
+   MISSING_PANEL_X_INDS = 10:17;
+end
+
+% Split the bar to create a smoother transition on the side of the missing panel that is closer to 
+% the fly's visual field (i.e. more anterior). It might not make sense to do this for other missing
+% panel locations.
+yFillInds = MISSING_PANEL_Y_INDS(ismember(MISSING_PANEL_Y_INDS, topDotYpos));
+if ~isempty(yFillInds)
+    for iPos = 1:barWidth
+        nextDotPos = nextXPos:(nextXPos + iPos - 1);
+
+        Pats(yFillInds, nextDotPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
+                = 1;
+    end
+    
+    % Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
+    nextDotPos = nextXPos:(nextXPos + dotSize - 1);
+    Pats(yFillInds, nextDotPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
+end
+
+%------------ FILL IN BOTTOM DOT PATTERN ---------------------
+
+% Build intial dot pattern 
+bottomDotPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
+bottomDotPattern(bottomDotYpos, 1:dotSize) = 1;
+
+% Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
+bottomDotStartInd = 89 - dotSize;
+for xPos = 1:HORZ_LED_COUNT
+    if strcmpi(topDotMotionDirection, 'cw')
+        Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                ShiftMatrix(bottomDotPattern, bottomDotStartInd - xPos - 1, 'r', 'y');
+    elseif strcmpi(topDotMotionDirection, 'ccw')
+        Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                ShiftMatrix(bottomDotPattern, bottomDotStartInd - xPos - 1, 'l', 'y');
+    else
+        error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
+    end
+end
+yFillInds = MISSING_PANEL_Y_INDS(ismember(MISSING_PANEL_Y_INDS, bottomDotYpos));
+if ~isempty(yFillInds)
+    warning('WARNING: bottom dot is high enough to disappear when it passes the missing LED panel')
+end
 
 %% SAVE PATTERN
 
