@@ -68,7 +68,7 @@ gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   3: 0-7
                     %   4: 0-15
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
-barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 try
 % Add general info to pattern structure
@@ -103,8 +103,9 @@ end
 nextXPos = MISSING_PANEL_X_INDS(end) + 1;
 
 if strcmpi(barMotionDirection, 'ccw')
-   MISSING_PANEL_X_INDS = 10:17;
-   
+    missingX = 10:17;
+else
+    missingX = MISSING_PANEL_X_INDS;   
 end
 
 % Split the bar to create a smoother transition on the side of the missing panel that is closer to 
@@ -116,13 +117,13 @@ if ~isempty(yFillInds)
         nextBarPos = nextXPos:(nextXPos + iPos - 1);
         
         
-        Pats(yFillInds, nextBarPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
+        Pats(yFillInds, nextBarPos, missingX(1) - barWidth + iPos, 1) ...
             = 1;
     end
     
     % Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
     nextBarPos = nextXPos:(nextXPos + barWidth - 1);
-    Pats(yFillInds, nextBarPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
+    Pats(yFillInds, nextBarPos, missingX(barWidth:end), 1) = 1;
 end
 % --------------------------------------------------------------------------------------------------
 
@@ -238,7 +239,12 @@ bottomDotPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
 bottomDotPattern(bottomDotYpos, 1:dotSize) = 1;
 
 % Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
-bottomDotStartInd = HORZ_LED_COUNT - missingX(end - dotSize);
+if strcmpi(topDotMotionDirection, 'cw')
+    bottomDotStartInd = HORZ_LED_COUNT - missingX(end - dotSize);
+else
+    bottomDotStartInd = HORZ_LED_COUNT - missingX(1) + 1;
+end
+
 for xPos = 1:HORZ_LED_COUNT
     if strcmpi(topDotMotionDirection, 'cw')
         shiftNum = bottomDotStartInd + xPos - 1;
@@ -251,12 +257,12 @@ for xPos = 1:HORZ_LED_COUNT
                     ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
         end
     elseif strcmpi(topDotMotionDirection, 'ccw')
-        shiftNum = bottomDotStartInd + xPos - 1;
+        shiftNum = bottomDotStartInd + xPos - dotSize;
         if shiftNum <= HORZ_LED_COUNT
             Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
                     ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
         else
-            shiftNum = xPos - missingX(end - dotSize) - 1;
+            shiftNum = xPos - missingX(1) - 1;
             Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
                     ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
         end            
@@ -298,7 +304,7 @@ catch ME; rethrow(ME); end
 testPat = Pats;
 yInd = 14;
 
-for iX = 1:size(testPat, 3)
+for iX = 40%:size(testPat, 3)
     figure(1); clf;
     imagesc(squeeze(testPat(:, :, iX, yInd)));
     axis equal
