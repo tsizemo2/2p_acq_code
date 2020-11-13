@@ -61,14 +61,14 @@ patternName = 'dot_size-2x2_yPos_11-12_Xdim-dotPosCCW_Ydim-brightness';
 patternNum = 16;
 
 barWidth = 2;               % bar width in LEDs
-barYpos = 11:12; %1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
+barYpos = 1:2; %1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
 gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
-barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 try
 % Add general info to pattern structure
@@ -168,6 +168,8 @@ gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
 topDotMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
+try
+    
 % Add general info to pattern structure
 pattern = [];
 pattern.x_num = HORZ_LED_COUNT + 1; % Specifies size of X index of the left edge of the bar (except for the last position, which blanks the panels)
@@ -178,6 +180,12 @@ pattern.Panel_map = PANEL_ADDRESS_MAP;
 
 % Construct the dot patterns within each dimension
 Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --> [arenaY, arenaX, patternX, patternY]
+
+if strcmpi(topDotMotionDirection, 'ccw')
+    missingX = 10:17;
+else
+    missingX = MISSING_PANEL_X_INDS;
+end
 
 %------------ FILL IN TOP DOT PATTERN ---------------------
 
@@ -192,33 +200,35 @@ for xPos = 1:HORZ_LED_COUNT
     elseif strcmpi(topDotMotionDirection, 'ccw')
         Pats(:, :, xPos, 1) = ShiftMatrix(topDotPattern, xPos - 1, 'l', 'y');
     else
-        error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
+        error('Invalid motion direction! Valid values are "CW" and "CCW".');
     end
 end
 
 % Make the LEDs from the upper row "jump" over the missing panel to keep total luminance within the 
 % arena constant
-nextXPos = MISSING_PANEL_X_INDS(end) + 1;
-
-if strcmpi(topDotMotionDirection, 'ccw')
-   MISSING_PANEL_X_INDS = 10:17;
-end
+if strcmpi(topDotMotionDirection, 'cw')
+    nextXPos = MISSING_PANEL_X_INDS(end) + 1;
+elseif strcmpi(topDotMotionDirection, 'ccw')
+    nextXPos = MISSING_PANEL_X_INDS(end) + 1;
+else
+    error('Invalid motion direction! Valid values are "CW" and "CCW".');
+end 
 
 % Split the bar to create a smoother transition on the side of the missing panel that is closer to 
 % the fly's visual field (i.e. more anterior). It might not make sense to do this for other missing
 % panel locations.
 yFillInds = MISSING_PANEL_Y_INDS(ismember(MISSING_PANEL_Y_INDS, topDotYpos));
 if ~isempty(yFillInds)
-    for iPos = 1:barWidth
+    for iPos = 1:dotSize
         nextDotPos = nextXPos:(nextXPos + iPos - 1);
 
-        Pats(yFillInds, nextDotPos, MISSING_PANEL_X_INDS(1) - barWidth + iPos, 1) ...
+        Pats(yFillInds, nextDotPos, missingX(1) - dotSize + iPos, 1) ...
                 = 1;
     end
     
     % Keep the "jumping" part of the bar waiting on the other side until the actual bar pos catches up
     nextDotPos = nextXPos:(nextXPos + dotSize - 1);
-    Pats(yFillInds, nextDotPos, MISSING_PANEL_X_INDS(barWidth:end), 1) = 1;
+    Pats(yFillInds, nextDotPos, missingX(dotSize:end), 1) = 1;
 end
 
 %------------ FILL IN BOTTOM DOT PATTERN ---------------------
@@ -228,14 +238,28 @@ bottomDotPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
 bottomDotPattern(bottomDotYpos, 1:dotSize) = 1;
 
 % Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
-bottomDotStartInd = 89 - dotSize;
+bottomDotStartInd = HORZ_LED_COUNT - missingX(end - dotSize);
 for xPos = 1:HORZ_LED_COUNT
     if strcmpi(topDotMotionDirection, 'cw')
-        Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
-                ShiftMatrix(bottomDotPattern, bottomDotStartInd - xPos - 1, 'r', 'y');
+        shiftNum = bottomDotStartInd + xPos - 1;
+        if shiftNum <= HORZ_LED_COUNT
+            Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                    ShiftMatrix(bottomDotPattern, shiftNum, 'l', 'y');
+        else
+            shiftNum = HORZ_LED_COUNT + (missingX(end-dotSize)) - xPos + 1;
+            Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                    ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
+        end
     elseif strcmpi(topDotMotionDirection, 'ccw')
-        Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
-                ShiftMatrix(bottomDotPattern, bottomDotStartInd - xPos - 1, 'l', 'y');
+        shiftNum = bottomDotStartInd + xPos - 1;
+        if shiftNum <= HORZ_LED_COUNT
+            Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                    ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
+        else
+            shiftNum = xPos - missingX(end - dotSize) - 1;
+            Pats(:, :, xPos, 1) = Pats(:, :, xPos, 1) + ...
+                    ShiftMatrix(bottomDotPattern, shiftNum, 'r', 'y');
+        end            
     else
         error('Invalid bar motion direction! Valid values are "CW" and "CCW".');
     end
@@ -244,6 +268,44 @@ yFillInds = MISSING_PANEL_Y_INDS(ismember(MISSING_PANEL_Y_INDS, bottomDotYpos));
 if ~isempty(yFillInds)
     warning('WARNING: bottom dot is high enough to disappear when it passes the missing LED panel')
 end
+
+% Adjust brightness values along the Y dimension
+for iY = 2:16
+    Pats(:, :, :, iY) = Pats(:, :, :, 1) .* (iY - 1);
+end
+Pats(:, :, :, 1) = 0; % Blank pattern when y=0
+
+% Add remaining data to pattern structure
+pattern.Pats = Pats;
+pattern.BitMapIndex = process_panel_map(pattern);
+pattern.data = Make_pattern_vector(pattern);
+ 
+% Add metadata to pattern structure (for reference only; not used by panels functions)
+pattern.userData.patternNum = patternNum;
+pattern.userData.patternName = patternName;
+pattern.userData.dotSize = dotSize;
+pattern.userData.topDotYpos = topDotYpos;
+pattern.userData.bottomDotYpos = bottomDotYpos;
+pattern.userData.topDotMotionDirection = topDotMotionDirection;
+pattern.userData.backgroundBrightness = backgroundBrightness;
+pattern.userData.missingPanelIndsX = MISSING_PANEL_X_INDS;
+pattern.userData.missingPanelIndsY = MISSING_PANEL_Y_INDS;
+
+catch ME; rethrow(ME); end
+
+%% PREVIEW PATTERN
+
+testPat = Pats;
+yInd = 14;
+
+for iX = 1:size(testPat, 3)
+    figure(1); clf;
+    imagesc(squeeze(testPat(:, :, iX, yInd)));
+    axis equal
+    pause(0.1)
+    drawnow()    
+end
+
 
 %% SAVE PATTERN
 
