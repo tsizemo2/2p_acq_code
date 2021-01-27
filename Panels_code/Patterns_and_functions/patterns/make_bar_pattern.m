@@ -160,14 +160,14 @@ dotSize = 2;               % dot width in LEDs
 
 % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
 topDotYpos = 1:2;
-bottomDotYpos = 11:12;
+bottomDotYpos = 9:10;
 gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
-topDotMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
+topDotMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
 try
     
@@ -304,7 +304,7 @@ catch ME; rethrow(ME); end
 testPat = Pats;
 yInd = 14;
 
-for iX = 40%:size(testPat, 3)
+for iX = 1:size(testPat, 3)
     figure(1); clf;
     imagesc(squeeze(testPat(:, :, iX, yInd)));
     axis equal

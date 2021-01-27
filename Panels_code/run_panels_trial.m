@@ -14,6 +14,8 @@ s.Rate = mD.SAMPLING_RATE;
 %       AI.20 = Panels X dim position telegraph
 %       AI.21 = Panels Y dim position telegraph
 %
+%       AI.23 = PID input signal
+%
 % Output channels:
 %
 %   Dev1:
@@ -26,13 +28,13 @@ s.Rate = mD.SAMPLING_RATE;
 %%% ---------- SET UP DAQ CHANNELS ---------- %%%
 
 % Add analog input channels for panels position telegraph outputs
-s.addAnalogInputChannel('Dev1', 20:21, 'Voltage');
+s.addAnalogInputChannel('Dev1', [6 20:21], 'Voltage');
 
 % This channel is for external triggering of scanimage
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
 % Output channel for opto stim LED
-s.addDigitalChannel('Dev1', 'port0/line5', 'OutputOnly');
+% s.addDigitalChannel('Dev1', 'port0/line5', 'OutputOnly');
 
 % Output channel for olfactometer command (shares opto stim settings)
 s.addDigitalChannel('Dev1', 'port0/line2', 'OutputOnly');
@@ -101,10 +103,13 @@ alignLEDCommand(end-LEDOnSamples:end) = 1;
 panelsStartTrigger = siTrigger; % sending the same trigger command to scanimage and the panels
 
 % Create output data array
-outputData = [siTrigger, optoStimCommand, optoStimCommand, alignLEDCommand, panelsStartTrigger];
+% outputData = [siTrigger, optoStimCommand, optoStimCommand, alignLEDCommand, panelsStartTrigger];
+outputData = [siTrigger, optoStimCommand, alignLEDCommand, panelsStartTrigger];
+
 
 % Create column labels for output data
-columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand', 'OlfactometerCommand', 'AlignmentLEDCommand', 'PanelsStartTrigger'};
+% columnLabels.out = {'ScanImageStartTrigger', 'OptoStimCommand', 'OlfactometerCommand', 'AlignmentLEDCommand', 'PanelsStartTrigger'};
+columnLabels.out = {'ScanImageStartTrigger', 'OlfactometerCommand', 'AlignmentLEDCommand', 'PanelsStartTrigger'};
 
 % Queue output data
 outputData(end, :) = 0; % To make sure everything turns off at the end of the trial
@@ -135,5 +140,17 @@ end
 % Start the session
 [trialData, ~] = s.startForeground();
 release(s);
+
+% % TEMPORARY: PLOT PID SIGNAL
+% pidData = smooth(trialData(:, 1), 500, 'moving');
+% sampleTimes = (1:numel(pidData)) / mD.SAMPLING_RATE;
+% f = figure(165); clf;
+% f.Color = [1 1 1];
+% plot(sampleTimes, pidData, 'linewidth', 2);
+% yyaxis right; 
+% plot(sampleTimes, optoStimCommand, 'color', 'r')
+% ax = gca;
+% ax.FontSize = 14;
+% xlabel('Time (s)');
 
 end

@@ -154,6 +154,10 @@ cmdOut = strsplit(cmdOut);
 pid = cmdOut{2};
 system(['"C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\windows-kill.exe" -SIGINT ', pid]);
 
+% Wait a sec and send another one just for good measure
+pause(1)
+system(['"C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\windows-kill.exe" -SIGINT ', pid]);
+
 % Close scanimage connection
 if tS.using2P
     fprintf(scanimageClientSkt, 'END_OF_SESSION');
@@ -177,7 +181,7 @@ save([saveFilePrefix, 'daqData', saveFileSuffix], 'trialData', 'outputData', 'co
 % one .log with the log, one .txt with the video frame log, and one .avi with the raw video.
 
 % Pause to make sure FicTrac process has terminated
-pause(2)
+pause(5)
 
 % Identify the new output files in the main experiment directory
 ftLogFiles = dir(fullfile(mD.expDir, 'fictrac*.dat'));

@@ -96,6 +96,37 @@ end
 
 func = positionArray; % Needs to be named this for panels code to read it
 
+%%
+
+functionName = 'bath_ATP_exp_dispRate-50_cycleTime-20_framesPerPos-10_baselineDur_180';
+functionNum = 14;
+
+baselineDur = 300;
+displayRate = 50;
+positionsPerCycle = HORZ_LED_COUNT;
+cycleTime = 20; % this is the desired time to complete one cycle through the target dimension at 
+% displayRate. NOTE: actual cycle time will be slightly different to ensure that the same integer 
+% number of frames is spent at each position.
+
+targetFramesPerCycle = displayRate * cycleTime;
+framesPerPosition = round(targetFramesPerCycle / positionsPerCycle);
+
+actualCycleTime = (framesPerPosition * positionsPerCycle) / displayRate;
+actualFramesPerCycle = displayRate * actualCycleTime;
+
+% Create the position function array (note that it is zero indexed!)
+positionArray = [];
+for iFrame = 1:actualFramesPerCycle
+    positionArray(iFrame) = fix((iFrame - 1) / framesPerPosition);
+end
+
+% Blank alternating cycles after the end of the baseline period
+targetBaselineDurFrames = displayRate * baselineDur;
+actualBaselineDurFrames = actualFramesPerCycle * ...
+        mod(actualFramesPerCycle, targetBaselineDurFrames);
+
+
+func = positionArray; % Needs to be named this for panels code to read it
 
 %% SAVE POSITION FUNCTION
 
