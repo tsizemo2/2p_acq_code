@@ -125,6 +125,14 @@ if tS.usingPanels
             'PanelsMode', tS.panelsMode, 'PosFunNumX', tS.xDimPosFunNum, 'PosFunNumY', tS.yDimPosFunNum);
 end
 
+
+% TODO:
+% -add boolean to use a different config.txt file for 'closed loop' panels
+% mode
+% -call socket_client_360 to open socket connection from fictrac to
+% Phiget22 device
+% - 
+
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe';
 cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
