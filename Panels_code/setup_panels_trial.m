@@ -131,7 +131,10 @@ end
 % mode
 % -call socket_client_360 to open socket connection from fictrac to
 % Phiget22 device
-% - 
+%
+% Note: config.txt is copied in to the expt folder by the GUI when the angle is picked...
+% add check logic for Sock_port for the config that works with closed
+% loop....
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe';
