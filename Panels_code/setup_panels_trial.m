@@ -126,15 +126,8 @@ if tS.usingPanels
 end
 
 
-% TODO:
-% -add boolean to use a different config.txt file for 'closed loop' panels
-% mode
-% -call socket_client_360 to open socket connection from fictrac to
-% Phiget22 device
-%
-% Note: config.txt is copied in to the expt folder by the GUI when the angle is picked...
-% add check logic for Sock_port for the config that works with closed
-% loop....
+% Note: config.txt is copied in to the expt folder by the GUI when the angle is picked
+% YEF, make sure this works with open and closed loop...
 
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe';
@@ -142,6 +135,14 @@ cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
         '" config.txt & exit'];
 system(cmdStr);
 pause(4);
+
+
+% if recording in 'closed loop' panels mode call socket_client_360 to open socket connection from fictrac to
+% Phiget22 device
+if(strcmp(panelsMode,'closed loop'))
+    system('python socket_client_360.py'); %run python socket script
+end
+
 
 % Add some hardcoded session params
 mD.SAMPLING_RATE = 10000;
