@@ -141,9 +141,15 @@ pause(4);
 % Phiget22 device
 if(strcmp(tS.panelsMode,'closed loop'))
     Socket_PATH = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\';
-    system( ['cd ' Socket_PATH])%navigate to socket client script directory
-    %system('python socket_client_360.py'); %run python socket script
-    system('python socket_client_360.py &'); %run python socket script and keep console window open in background
+%         [status] = system( ['cd "' Socket_PATH '"'])%navigate to socket client script directory
+%         %system( ['cd ' Socket_PATH ' &'])%navigate to socket client script directory
+%         %system('python socket_client_360.py'); %run python socket script
+%         system('python socket_client_360.py &'); %run python socket script and keep console window open in background
+    
+    
+     SOCKET_SCRIPT_NAME = 'socket_client_360.py';
+     cmdstring = ['cd "' Socket_PATH '" & python ' SOCKET_SCRIPT_NAME ' &']
+     [status] = system(cmdstring, '-echo')
 end
 
 
@@ -157,9 +163,9 @@ disp(['Trial end time: ' datestr(now + (tS.trialDuration * daysPerSec), 'HH:MM:S
 [trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
 
 
-if(strcmp(tS.panelsMode,'closed loop'))
-    system('exit'); % exit console opened for python socket
-end
+% if(strcmp(tS.panelsMode,'closed loop'))
+%     system('exit'); % exit console opened for python socket
+% end
 
 % Turn off panels if necessary
 if tS.usingPanels
@@ -177,6 +183,8 @@ system(['"C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\windows-kill.exe" -SIG
 % Wait a sec and send another one just for good measure
 pause(1)
 system(['"C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\windows-kill.exe" -SIGINT ', pid]);
+
+%TODO - add code here to kill the python socket command window
 
 % Close scanimage connection
 if tS.using2P
