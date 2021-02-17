@@ -139,8 +139,11 @@ pause(4);
 
 % if recording in 'closed loop' panels mode call socket_client_360 to open socket connection from fictrac to
 % Phiget22 device
-if(strcmp(panelsMode,'closed loop'))
-    system('python socket_client_360.py'); %run python socket script
+if(strcmp(tS.panelsMode,'closed loop'))
+    Socket_PATH = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\';
+    system( ['cd ' Socket_PATH])%navigate to socket client script directory
+    %system('python socket_client_360.py'); %run python socket script
+    system('python socket_client_360.py &'); %run python socket script and keep console window open in background
 end
 
 
@@ -152,6 +155,11 @@ disp(['Starting trial #', num2str(mD.trialNum), ' at ', datestr(now, 'HH:MM:SS P
 daysPerSec = 1 * (1/24) * (1/60) * (1/60);
 disp(['Trial end time: ' datestr(now + (tS.trialDuration * daysPerSec), 'HH:MM:SS PM')])
 [trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
+
+
+if(strcmp(tS.panelsMode,'closed loop'))
+    system('exit'); % exit console opened for python socket
+end
 
 % Turn off panels if necessary
 if tS.usingPanels

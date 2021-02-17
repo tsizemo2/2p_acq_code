@@ -46,22 +46,16 @@ closedLoopDim = p.Results.ClosedLoopDim;
 posFunNumX = p.Results.PosFunNumX;
 posFunNumY = p.Results.PosFunNumY;
 
-% Set initial position
-Panel_com('set_position',  initialPos) % Panel_com will convert this from 1-indexed to 0-indexed
-pause(0.03)
-
-% Set pattern number
+% Warning:for closed loop(3)you NEED to set pattern before init position if
+% you want the set intial position to be used
 Panel_com('set_pattern_id', patternNum); % TODO: panels turn on and display the first pattern position here
 pause(0.03)
 
-% Set X and Y position functions. Function #1 should always be a static vector telling the panels to 
-% just remain at the first index for that dimension.
-Panel_com('set_posfunc_id', [1, posFunNumX]);
-pause(0.03)
-Panel_com('set_posfunc_id', [2, posFunNumY]);
+Panel_com('set_position',  initialPos) % Panel_com will convert this from 1-indexed to 0-indexed
 pause(0.03)
 
-% Set panel mode - technically each dimension can be set to any of the modes outlined below, but we
+
+% Set panel mode and other parameters - technically each dimension can be set to any of the modes outlined below, but we
 % only use one of two settings in our setups.
 %   0 - open loop (but not the one we use - rather than accepting a vector of external pattern
 %       indices, this one uses gain and bias settings to cycle through the pattern frames in order)
@@ -71,34 +65,51 @@ pause(0.03)
 %   4 - internal function generator sets velocity/position <-- OPEN LOOP FOR OUR EXPERIMENTS
 %   5 - interal function generator debug mode
 if strcmpi(regexprep(panelsMode, ' ', ''), 'OpenLoop')
-    % Argument is [Xmode, Ymode]. Both dimensions will use the position functions provided.
-    Panel_com('set_mode', [4, 4]) 
+    %%%%% OPEN LOOP %%%%%%
+    
+    % Set X and Y position functions. Function #1 should always be a static vector telling the panels to
+    % just remain at the first index for that dimension.
+    Panel_com('set_posfunc_id', [1, posFunNumX]);
     pause(0.03)
+    Panel_com('set_posfunc_id', [2, posFunNumY]);
+    pause(0.03)
+    
+    % Argument is [Xmode, Ymode]. Both dimensions will use the position functions provided.
+    Panel_com('set_mode', [4, 4])
+    pause(0.03)
+    
+    % Set display update frequency
+    disp(whos('displayRate'))
+    Panel_com('set_funcy_freq', displayRate);
+    pause(0.03);
+    Panel_com('set_funcx_freq', displayRate);
+    pause(0.03);
+    
 elseif strcmpi(regexprep(panelsMode, ' ', ''), 'ClosedLoop')
-    % Set one dimension to be under external closed loop control, and lock the other in its starting 
+    %%%%% CLOSED LOOP %%%%%%
+    
+    % Set one dimension to be under external closed loop control, and lock the other in its starting
     % position.
     if strcmp(closedLoopDim, 'x')
-        Panel_com('set_mode', [3, 0]); 
+        
+        Panel_com('set_mode', [3, 0]);
+        pause(0.03);
+        
     elseif strcmp(closedLoopDim, 'y')
+        %NOT functional
         Panel_com('set_mode', [0, 3]);
     else
-        error('Invalid closed loop dim. Valid values are "x" or "y".'); 
+        error('Invalid closed loop dim. Valid values are "x" or "y".');
     end
     pause(0.03);
-    % Make sure the dimension that's not under closed-loop control just stays in its intial 
-    % position (by setting the rate of cycling through pattern frames to zero in mode #0)
+    %     % Make sure the dimension that's not under closed-loop control just stays in its intial
+    %     % position (by setting the rate of cycling through pattern frames to zero in mode #0)
     Panel_com('send_gain_bias', [0 0 0 0]);
     pause(0.03);
 else
     error('Invalid panel mode. Valid values are "OpenLoop" or "ClosedLoop".');
 end
 
-% Set display update frequency
-disp(whos('displayRate'))
-Panel_com('set_funcy_freq', displayRate);
-pause(0.03);
-Panel_com('set_funcx_freq', displayRate);
-pause(0.03);
 
 % Enable external trigger
 %  Panel_com('enable_extern_trig');

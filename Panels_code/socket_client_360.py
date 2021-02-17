@@ -24,7 +24,7 @@ import numpy as np
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 65413  # Port to listen on (non-privileged ports are > 1023)
-
+# Phidget serial number = 525487   (Berg 2, MM & YEF controller)
 
 
 # *********** SET AOUT PARAMETERS ********
