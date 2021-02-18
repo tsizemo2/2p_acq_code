@@ -83,13 +83,28 @@ end
 mD.expDirName = expDirName;
 mD.expDir = fullfile(tS.saveDir, expDirName);
 
-% Copy the FicTac config file to the experiment directory if it is not already there
-configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once');
-if ~exist(fullfile(mD.expDir, configFileName), 'file')
-%     disp(tS.ftConfigFile)
-%     disp(fullfile(mD.expDir, configFileName));
-    copyfile(tS.ftConfigFile, fullfile(mD.expDir, 'config.txt'));
+
+%Get wanted config full file name
+wantedConfigFullFileName = tS.ftConfigFile;
+
+%For closed loop mode amend config full filename with '_closedLoop.txt'
+if(strcmp(tS.panelsMode,'closed loop'))
+    configFileNameSegment = regexprep(wantedConfigFullFileName, '\.txt$','');
+    wantedConfigFullFileName = [configFileNameSegment '_closedLoop.txt'];
 end
+
+copyfile(wantedConfigFullFileName, fullfile(mD.expDir, 'config.txt'));
+
+%%% YEF: COMMENTED out because I think this had a bug where is checked for the
+%%% config file with a certain name but never found it because it was
+%%% always saved at config.txt....
+% % Copy the FicTac config file to the experiment directory if it is not already there
+%configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once');
+% if ~exist(fullfile(mD.expDir, configFileName), 'file')
+% %     disp(tS.ftConfigFile)
+% %     disp(fullfile(mD.expDir, configFileName));
+%     copyfile(tS.ftConfigFile, fullfile(mD.expDir, 'config.txt'));
+% end
 
 % Determine next trial number by looking at previously saved metadata files
 mdFiles = dir(fullfile(mD.expDir, '*metadata*.mat'));
@@ -141,15 +156,9 @@ pause(4);
 % Phiget22 device
 if(strcmp(tS.panelsMode,'closed loop'))
     Socket_PATH = 'C:\Users\Wilson Lab\Desktop\Michael\2p_acq_code\Panels_code\';
-%         [status] = system( ['cd "' Socket_PATH '"'])%navigate to socket client script directory
-%         %system( ['cd ' Socket_PATH ' &'])%navigate to socket client script directory
-%         %system('python socket_client_360.py'); %run python socket script
-%         system('python socket_client_360.py &'); %run python socket script and keep console window open in background
-    
-    
      SOCKET_SCRIPT_NAME = 'socket_client_360.py';
-     cmdstring = ['cd "' Socket_PATH '" & python ' SOCKET_SCRIPT_NAME ' &']
-     [status] = system(cmdstring, '-echo')
+     cmdstring = ['cd "' Socket_PATH '" & python ' SOCKET_SCRIPT_NAME ' &'];
+     [status] = system(cmdstring, '-echo');
 end
 
 
