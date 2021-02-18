@@ -307,7 +307,7 @@ patternNum = 17;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
-gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
+gsVal = 1;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
@@ -397,12 +397,12 @@ catch ME; rethrow(ME); end
 
 %% CREATE CLOSED LOOP (INVERTED gain) PATTERN
 
-patternName = 'ClosedLoopInverted_bright_bar_height-16_width_2_brightness-100-barPosCCW';
+patternName = 'ClosedLoopInverted_bright_bar_height-16_width_2_brightness-100-barPosCW';
 patternNum = 18;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
-gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
+gsVal = 1;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
