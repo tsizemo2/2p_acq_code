@@ -318,7 +318,7 @@ barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - eit
 try
 % Add general info to pattern structure
 pattern = [];
-pattern.x_num = HORZ_LED_COUNT + 1; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
+pattern.x_num = HORZ_LED_COUNT; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
 pattern.y_num = 1;              % Brightness of the bar from 0-15 (0 turns the bar off)
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;
@@ -413,7 +413,7 @@ barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - eith
 try
 % Add general info to pattern structure
 pattern = [];
-pattern.x_num = HORZ_LED_COUNT + 1; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
+pattern.x_num = HORZ_LED_COUNT; % Specifies X index of the left edge of the bar (except for the last position, which blanks the panels)
 pattern.y_num = 1;              % Brightness of the bar from 0-15 (0 turns the bar off)
 pattern.num_panels = VERT_PANEL_COUNT * HORZ_PANEL_COUNT; % Total number of panel addresses
 pattern.gs_val = gsVal;

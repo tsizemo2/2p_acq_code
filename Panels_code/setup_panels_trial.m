@@ -95,17 +95,6 @@ end
 
 copyfile(wantedConfigFullFileName, fullfile(mD.expDir, 'config.txt'));
 
-%%% YEF: COMMENTED out because I think this had a bug where is checked for the
-%%% config file with a certain name but never found it because it was
-%%% always saved at config.txt....
-% % Copy the FicTac config file to the experiment directory if it is not already there
-%configFileName = regexp(tS.ftConfigFile, '(?<=\\)[^\\]*(\.txt)', 'match', 'once');
-% if ~exist(fullfile(mD.expDir, configFileName), 'file')
-% %     disp(tS.ftConfigFile)
-% %     disp(fullfile(mD.expDir, configFileName));
-%     copyfile(tS.ftConfigFile, fullfile(mD.expDir, 'config.txt'));
-% end
-
 % Determine next trial number by looking at previously saved metadata files
 mdFiles = dir(fullfile(mD.expDir, '*metadata*.mat'));
 fileNames = {mdFiles.name};
@@ -141,9 +130,6 @@ if tS.usingPanels
 end
 
 
-% Note: config.txt is copied in to the expt folder by the GUI when the angle is picked
-% YEF, make sure this works with open and closed loop...
-
 % Start FicTrac in background from current experiment directory (config file must be in directory)
 FT_PATH = 'C:\Users\Wilson Lab\Documents\fictrac-develop\bin\Release\fictrac.exe';
 cmdStr = ['cd "', mD.expDir, '" & start "" "',  FT_PATH, ...
@@ -171,10 +157,6 @@ daysPerSec = 1 * (1/24) * (1/60) * (1/60);
 disp(['Trial end time: ' datestr(now + (tS.trialDuration * daysPerSec), 'HH:MM:SS PM')])
 [trialData, outputData, columnLabels] = run_panels_trial(mD, scanimageClientSkt);
 
-
-% if(strcmp(tS.panelsMode,'closed loop'))
-%     system('exit'); % exit console opened for python socket
-% end
 
 % Turn off panels if necessary
 if tS.usingPanels

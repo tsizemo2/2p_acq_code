@@ -53,17 +53,17 @@ aout_yawGain.setVoltage(0.0)
 
 # Setup analog output 'int x' for integrated x position
     # Sent to DAQ
-aout_intX = VoltageOutput()
-aout_intX.setChannel(1)
-aout_intX.openWaitForAttachment(5000)
-aout_intX.setVoltage(0.0)
+aout_int_forward = VoltageOutput()
+aout_int_forward.setChannel(1)
+aout_int_forward.openWaitForAttachment(5000)
+aout_int_forward.setVoltage(0.0)
 
 # Setup analog output 'int y' for integrated y position
     # Sent to DAQ
-aout_intY = VoltageOutput()
-aout_intY.setChannel(2)
-aout_intY.openWaitForAttachment(5000)
-aout_intY.setVoltage(0.0)
+aout_int_side = VoltageOutput()
+aout_int_side.setChannel(2)
+aout_int_side.openWaitForAttachment(5000)
+aout_int_side.setVoltage(0.0)
 
 # Setup analog output - currently unused
 aout_blank = VoltageOutput()
@@ -131,8 +131,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         heading = float(toks[17])
         step_dir = float(toks[18])
         step_mag = float(toks[19])
-        intx2 = float(toks[20])
-        inty2 = float(toks[21])
+        int_forward = float(toks[20]) # Integrated x position (radians) neglecting heading, Equivalent to the output from two optic mice.
+        int_side = float(toks[21]) # Integrated y position (radians) neglecting heading, Equivalent to the output from two optic mice.
         ts = float(toks[22])
         seq = int(toks[23])
 
@@ -145,20 +145,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         heading_v = heading_v * 10 / (2 * np.pi) #convert to V
 
         # convert integrated x position from 0-2pi to 0-10V scale
-        intx_v = intx % (2 * np.pi) #take difference
-        intx_v = intx_v * 10 / (2 * np.pi) #convert to V
+        int_forward_v = int_forward % (2 * np.pi) #take difference
+        int_forward_v = int_forward_v * 10 / (2 * np.pi) #convert to V
 
         # convert integrated y position from 0-2pi to 0-10V scale
-        inty_v = inty % (2 * np.pi) #take difference
-        inty_v = inty_v * 10 / (2 * np.pi) #convert to V
+        int_side_v = int_side % (2 * np.pi) #take difference
+        int_side_v = int_side_v * 10 / (2 * np.pi) #convert to V
 
 
 
         # *********** SEND OUTPUT VARIABLES TO PHIDGET ***********
 
         aout_yawGain.setVoltage(heading_v)
-        aout_intX.setVoltage(intx_v)
-        aout_intY.setVoltage(inty_v)
+        aout_int_forward.setVoltage(int_forward_v)
+        aout_int_side.setVoltage(int_side_v)
         aout_blank.setVoltage(0.0)
 
 
@@ -167,8 +167,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     
     # When finished, close outputs (this sets voltages to 0)
     aout_yawGain.close()
-    aout_intX.close()
-    aout_intY.close()
+    aout_int_forward.close()
+    aout_int_side.close()
     aout_blank.close()
 
 

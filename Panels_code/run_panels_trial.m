@@ -16,8 +16,8 @@ s.Rate = mD.SAMPLING_RATE;
 %
 %       AI.23 = PID input signal
 %
-%       AI.4 = ficTrac inty (0-10V) telegraph
-%       AI.5 = ficTrac intx (0-10V) telegraph
+%       AI.4 = ficTrac int_side (0-10V) telegraph
+%       AI.5 = ficTrac int_forward (0-10V) telegraph
 %       AI.6 = ficTrac yaw (0-10V) telegraph 
 %
 % Output channels:
@@ -35,7 +35,7 @@ s.Rate = mD.SAMPLING_RATE;
 %s.addAnalogInputChannel('Dev1', [6 20:21], 'Voltage');
 s.addAnalogInputChannel('Dev1', [20:21], 'Voltage');
 
-% Add analog input channels for ficTrac ball outputs (yaw,intx,inty)
+% Add analog input channels for ficTrac ball outputs (int_side,int_forward,yaw)
 s.addAnalogInputChannel('Dev1',[4:6],'Voltage');
 
 % This channel is for external triggering of scanimage
@@ -56,7 +56,7 @@ s.addDigitalChannel('Dev1', 'port0/line8', 'OutputOnly');
 % Create labels for columns of recorded data array
 %columnLabels.in = {'PanelsXDimTelegraph', 'PanelsYDimTelegraph'};
 columnLabels.in = {'PanelsXDimTelegraph', 'PanelsYDimTelegraph', ...
-     'ficTracInty', 'ficTracIntx','ficTracYaw'};
+     'ficTracIntSide', 'ficTracIntForward','ficTracYaw'};
 
 %%% ---------- SET UP OUTPUT DATA ---------- %%%
 

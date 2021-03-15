@@ -96,7 +96,7 @@ elseif strcmpi(regexprep(panelsMode, ' ', ''), 'ClosedLoop')
         pause(0.03);
         
     elseif strcmp(closedLoopDim, 'y')
-        %NOT functional
+        %Check functionality before use
         Panel_com('set_mode', [0, 3]);
     else
         error('Invalid closed loop dim. Valid values are "x" or "y".');
@@ -110,9 +110,4 @@ else
     error('Invalid panel mode. Valid values are "OpenLoop" or "ClosedLoop".');
 end
 
-
-% Enable external trigger
-%  Panel_com('enable_extern_trig');
-% Panel_com('start');
-% pause(0.03);
 end
