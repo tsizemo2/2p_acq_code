@@ -302,16 +302,17 @@ catch ME; rethrow(ME); end
 
 %% CREATE CLOSED LOOP (normal gain) PATTERN
 
-patternName = 'ClosedLoopNormal_bright_bar_height-16_width_2_brightness-100-barPosCCW';
-patternNum = 17;
+patternName = 'ClosedLoopNormal_bright_bar_height-16_width_2_brightness-7-barPosCCW';
+patternNum = 21;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
-gsVal = 1;       % Specifies grey scale range mapping of the values in Pats:
+gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
+barBrightness = 1;
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
 barMotionDirection = 'CCW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
@@ -329,7 +330,7 @@ Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --
 
 % Build intial bar pattern 
 barPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
-barPattern(barYpos, 1:barWidth) = 1;
+barPattern(barYpos, 1:barWidth) = 1 * barBrightness;
 
 % Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
 for xPos = 1:HORZ_LED_COUNT
@@ -397,16 +398,17 @@ catch ME; rethrow(ME); end
 
 %% CREATE CLOSED LOOP (INVERTED gain) PATTERN
 
-patternName = 'ClosedLoopInverted_bright_bar_height-16_width_2_brightness-100-barPosCW';
-patternNum = 18;
+patternName = 'ClosedLoopInverted_bright_bar_height-16_width_2_brightness-7-barPosCW';
+patternNum = 22;
 
 barWidth = 2;               % bar width in LEDs
 barYpos = 1:VERT_LED_COUNT; % Y-indices (indexed from TOP to BOTTOM) of LEDs covered by the bar
-gsVal = 1;       % Specifies grey scale range mapping of the values in Pats:
+gsVal = 4;       % Specifies grey scale range mapping of the values in Pats:
                     %   1: binary (0-1) 
                     %   2: 0-3
                     %   3: 0-7
                     %   4: 0-15
+barBrightness = 1; 
 backgroundBrightness = 0;   % Maps onto to the selected gsVal range
 barMotionDirection = 'CW';  % Direction that bar moves as X dim increases - either "CW" or "CCW"
 
@@ -424,7 +426,7 @@ Pats = zeros(VERT_LED_COUNT, HORZ_LED_COUNT, pattern.x_num, pattern.y_num); % --
 
 % Build intial bar pattern 
 barPattern = backgroundBrightness * ones(VERT_LED_COUNT, HORZ_LED_COUNT);
-barPattern(barYpos, 1:barWidth) = 1;
+barPattern(barYpos, 1:barWidth) = 1 * barBrightness;
 
 % Fill X dimension of pattern array by shifting bar pattern clockwise by one LED as index increases
 for xPos = 1:HORZ_LED_COUNT
