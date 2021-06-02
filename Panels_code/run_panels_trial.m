@@ -38,6 +38,9 @@ s.addAnalogInputChannel('Dev1', [20:21], 'Voltage');
 % Add analog input channels for ficTrac ball outputs (int_side,int_forward,yaw)
 s.addAnalogInputChannel('Dev1',[4:6],'Voltage');
 
+% Add analog input channel for collecting PMT power signal
+s.addAnalogInputChannel('Dev1', 8, 'Voltage');
+
 % This channel is for external triggering of scanimage
 s.addDigitalChannel('Dev1', 'port0/line0', 'OutputOnly');
 
@@ -56,7 +59,7 @@ s.addDigitalChannel('Dev1', 'port0/line8', 'OutputOnly');
 % Create labels for columns of recorded data array
 %columnLabels.in = {'PanelsXDimTelegraph', 'PanelsYDimTelegraph'};
 columnLabels.in = {'PanelsXDimTelegraph', 'PanelsYDimTelegraph', ...
-     'ficTracIntSide', 'ficTracIntForward','ficTracYaw'};
+     'ficTracIntSide', 'ficTracIntForward','ficTracYaw', 'PMTpower'};
 
 %%% ---------- SET UP OUTPUT DATA ---------- %%%
 
